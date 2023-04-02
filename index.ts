@@ -3,4 +3,4 @@ import { bootstrap } from './src';
 
 dotenv.config();
 
-bootstrap();
+void bootstrap();
