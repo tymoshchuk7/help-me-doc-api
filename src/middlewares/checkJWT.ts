@@ -6,7 +6,7 @@ export default jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: process.env.AUTH0_JWKS_URI as string,
+    jwksUri: process.env.AUTH0_JWKS_URI,
   }) as jwks.GetVerificationKey,
   issuer: process.env.AUTH0_ISSUER,
   algorithms: ['RS256'],

@@ -1,6 +1,9 @@
 export interface IJwtUser {
-  given_name: string;
-  family_name: string;
+  meta_data: {
+    given_name: string;
+    family_name: string;
+  },
+  picture: string,
   email: string;
   sub: string;
   iat: number;
