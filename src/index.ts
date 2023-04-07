@@ -1,12 +1,14 @@
 import express, { json } from 'express';
 import cors from 'cors';
 import { initGlobalTables } from './database';
+import routes from './routes';
 
 const app = express();
 
 app.disable('x-powered-by');
 app.use(json());
 app.use(cors({ origin: 'http://localhost:3000' }));
+app.use('/v1', routes);
 
 const PORT = process.env.PORT || 8000;
 
