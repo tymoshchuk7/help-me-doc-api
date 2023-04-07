@@ -13,27 +13,45 @@ export const db = knex( {
 
 //TODO replace this function by migrations
 export const initGlobalTables = async () => {
-  await db.schema.createTable('users', (table) => {
-    table.increments('id');
-    table.string('email');
-    table.string('password');
-    table.string('family_name');
-    table.string('first_name');
-  });
-  await db.schema.createTable('diseases', (table) => {
-    table.increments('id');
-    table.integer('user_id').unsigned().references('users.id');
-    table.string('name');
-    table.string('status');
-    table.text('description');
-    table.text('treatment');
-  });
-  await db.schema.createTable('tenants', (table) => {
-    table.increments('id');
-    table.integer('user_id').unsigned().references('users.id');
+  if (!(await db.schema.hasTable('users'))) {
+    await db.schema.createTable('users', (table) => {
+      table.increments('id');
+      table.integer('tenant_id').unsigned().references('tenants.id');
 
-    table.string('tenant_participants_table');
-    table.string('tenant_chats_table');
-    table.string('tenant_messages_table');
-  });
+      table.string('email').unique();
+      table.string('avatar');
+      table.string('family_name');
+      table.string('first_name');
+      table.string('phone_number');
+    });
+  }
+  if (!(await db.schema.hasTable('diseases'))) {
+    await db.schema.createTable('diseases', (table) => {
+      table.increments('id');
+      table.integer('user_id').unsigned().references('users.id');
+      table.string('name');
+      table.string('status');
+      table.text('description');
+      table.text('treatment');
+    });
+  }
+  if (!(await db.schema.hasTable('tenants'))) {
+    await db.schema.createTable('tenants', (table) => {
+      table.increments('id');
+      table.integer('user_id').unsigned().references('users.id');
+
+      table.string('tenant_name').unique();
+      table.string('tenant_participants_table');
+      table.string('tenant_chats_table');
+      table.string('tenant_messages_table');
+    });
+  }
+  if (!(await db.schema.hasTable('invitations'))) {
+    await db.schema.createTable('invitations', (table) => {
+      table.increments('id');
+      table.integer('tenant_id').unsigned().references('tenants.id');
+      table.string('email');
+    });
+  }
 };
+
