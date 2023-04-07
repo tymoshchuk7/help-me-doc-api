@@ -13,6 +13,8 @@ const getError = (statusCode: number, errorText: string, errorCode?: string | nu
   return error;
 };
 
+//TODO fix ts type for express's Request
+
 
 export default (): [
   (req: Request, res: Response, next: NextFunction) => Promise<unknown>,
@@ -33,12 +35,15 @@ export default (): [
     res: Response,
     next: NextFunction,
   ) => {
-    const { email } = (request as unknown as AuthRequest).auth;
+    const {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      email, meta_data: { family_name, given_name }, picture: avatar,
+    } = (request as unknown as AuthRequest).auth;
 
     const user = await db('users').where({ email });
 
     if (isEmpty(user)) {
-      await db('users').insert({ email });
+      await db('users').insert({ email, family_name, given_name, avatar });
       (request as unknown as AuthRequest).user = (await db('users').where({ email }))[0];
     } else {
       (request as unknown as AuthRequest).user = user[0];
