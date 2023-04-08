@@ -1,7 +1,7 @@
 export interface IJwtUser {
   meta_data: {
-    given_name: string;
-    family_name: string;
+    first_name: string;
+    last_name: string;
   },
   picture: string,
   email: string;
@@ -22,3 +22,9 @@ export interface AuthRequest<B = any> {
   user: Record<string, string>
 }
 
+export interface ITableNames {
+  participants_table: string,
+  chats_table: string,
+  messages_table: string,
+  chat_members_table: string
+}

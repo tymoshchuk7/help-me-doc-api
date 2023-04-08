@@ -16,11 +16,11 @@ export const initGlobalTables = async () => {
   if (!(await db.schema.hasTable('users'))) {
     await db.schema.createTable('users', (table) => {
       table.increments('id');
-      table.integer('tenant_id').unsigned().references('tenants.id');
+      // table.integer('tenant_id').unsigned().references('tenants.id');
 
       table.string('email').unique();
       table.string('avatar');
-      table.string('family_name');
+      table.string('last_name');
       table.string('first_name');
       table.string('phone_number');
     });

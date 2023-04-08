@@ -37,13 +37,12 @@ export default (): [
   ) => {
     const {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      email, meta_data: { family_name, given_name }, picture: avatar,
+      email, meta_data: { first_name, last_name }, picture: avatar,
     } = (request as unknown as AuthRequest).auth;
-
     const user = await db('users').where({ email });
 
     if (isEmpty(user)) {
-      await db('users').insert({ email, family_name, given_name, avatar });
+      await db('users').insert({ email, first_name, last_name, avatar });
       (request as unknown as AuthRequest).user = (await db('users').where({ email }))[0];
     } else {
       (request as unknown as AuthRequest).user = user[0];
