@@ -64,6 +64,8 @@ export const createTenant = async (userId: string) => {
     }
   });
 
-  return db('tenants').where({ tenant_name: tenantName });
+  const newTenant = (await db('tenants').where({ tenant_name: tenantName }))?.[0];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return newTenant;
 };
 
