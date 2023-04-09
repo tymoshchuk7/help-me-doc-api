@@ -2,7 +2,7 @@
   "name": "help-me-doc-api",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "app/index.js",
   "scripts": {
     "migrate": "NODE_ENV=development knex migrate:lasted",
     "migrate-rollback": "NODE_ENV=development knex migrate:rollback",

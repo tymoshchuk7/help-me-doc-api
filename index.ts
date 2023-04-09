@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { bootstrap } from './src';
+import { bootstrap } from './app';
 
 dotenv.config();
 
