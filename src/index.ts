@@ -1,6 +1,5 @@
 import express, { json } from 'express';
 import cors from 'cors';
-import { initGlobalTables } from './database';
 import routes from './routes';
 
 const app = express();
@@ -12,7 +11,6 @@ app.use('/v1', routes);
 
 const PORT = process.env.PORT || 8000;
 
-export const bootstrap = async () => {
-  await initGlobalTables();
+export const bootstrap = () => {
   app.listen(PORT, () => console.log(`Server has started on ${PORT}`));
 };
