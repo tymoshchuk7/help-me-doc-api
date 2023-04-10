@@ -3,8 +3,8 @@ import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('invitations', (table) => {
-    table.increments('id');
-    table.integer('tenant_id').unsigned().references('tenants.id');
+    table.uuid('id').unique();
+    table.uuid('tenant_id').unsigned().references('tenants.id');
     table.string('email');
   });
 }

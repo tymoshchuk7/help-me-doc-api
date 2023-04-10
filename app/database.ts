@@ -22,30 +22,31 @@ export const createTenant = async (userId: string) => {
   await db.transaction(async (trx) => {
     try {
       await db.schema.createTable(participants_table, (table) => {
-        table.increments('id');
-        table.integer('user_id').unsigned().references('users.id');
+        table.uuid('id').unique();
+        table.uuid('user_id').unsigned().references('users.id');
+        table.string('status');
+        table.string('role');
       }).transacting(trx);
 
       await db.schema.createTable(chats_table, (table) => {
-        table.increments('id');
-        table.integer('participant_id').unsigned().references(`${participants_table}.id`);
-        table.string('status');
+        table.uuid('id').unique();
+        table.uuid('participant_id').unsigned().references(`${participants_table}.id`);
       }).transacting(trx);
 
       await db.schema.createTable(messages_table, (table) => {
-        table.increments('id');
-        table.integer('participant_id').unsigned().references(`${participants_table}.id`);
-        table.integer('chat_id').unsigned().references(`${chats_table}.id`);
+        table.uuid('id').unique();
+        table.uuid('participant_id').unsigned().references(`${participants_table}.id`);
+        table.uuid('chat_id').unsigned().references(`${chats_table}.id`);
 
         table.text('content');
         table.date('sent_timestamp');
       }).transacting(trx);
 
       await db.schema.createTable(chat_members_table, (table) => {
-        table.increments('id');
-        table.integer('participant_id').unsigned().references(`${participants_table}.id`);
-        table.integer('user_id').unsigned().references('users.id');
-        table.integer('chat_id').unsigned().references(`${chats_table}.id`);
+        table.uuid('id').unique();
+        table.uuid('participant_id').unsigned().references(`${participants_table}.id`);
+        table.uuid('user_id').unsigned().references('users.id');
+        table.uuid('chat_id').unsigned().references(`${chats_table}.id`);
       }).transacting(trx);
 
       await db('tenants').insert({
@@ -59,13 +60,12 @@ export const createTenant = async (userId: string) => {
 
       await trx.commit();
     } catch (e) {
-      console.error(e);
       await trx.rollback();
     }
   });
 
-  const newTenant = (await db('tenants').where({ tenant_name: tenantName }))?.[0];
+  const newTenant = await db('tenants').where({ tenant_name: tenantName });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return newTenant;
+  return newTenant?.[0];
 };
 
