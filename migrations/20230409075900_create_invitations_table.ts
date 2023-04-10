@@ -4,7 +4,7 @@ import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('invitations', (table) => {
     table.uuid('id').unique();
-    table.uuid('tenant_id').unsigned().references('tenants.id');
+    table.uuid('tenant');
     table.string('email');
   });
 }
