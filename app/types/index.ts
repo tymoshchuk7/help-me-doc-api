@@ -28,3 +28,38 @@ export interface ITableNames {
   messages_table: string,
   chat_members_table: string
 }
+
+export interface User {
+  id: string,
+  defaultTenant: string,
+  email: string,
+  avatar: string,
+  last_name: string,
+  first_name: string,
+  phone_number: string,
+}
+
+export interface Tenant {
+  id: string,
+  user_id: string,
+  tenant_name: string,
+  tenant_participants_table: string,
+  tenant_chats_table: string,
+  tenant_messages_table: string,
+  tenant_chats_members_table: string,
+}
+
+export interface Diseases {
+  id: string,
+  user_id: string,
+  name: string,
+  status: string,
+  description: string,
+  treatment: string,
+}
+
+export interface Invitation {
+  id: string,
+  tenant: string,
+  email: string,
+}
