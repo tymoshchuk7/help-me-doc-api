@@ -19,14 +19,22 @@ export interface AccessError extends Error {
 export interface AuthRequest<B = any> {
   body: B;
   auth: IJwtUser;
-  user: Record<string, string>
+  user: User;
 }
 
 export interface ITableNames {
   participants_table: string,
   chats_table: string,
   messages_table: string,
-  chat_members_table: string
+  chat_members_table: string,
+  media_table: string,
+}
+
+export enum GlobalTableNames {
+  users = 'users',
+  tenants = 'tenants',
+  invitations = 'invitations',
+  diseases = 'diseases',
 }
 
 export interface User {
@@ -47,6 +55,7 @@ export interface Tenant {
   tenant_chats_table: string,
   tenant_messages_table: string,
   tenant_chats_members_table: string,
+  tenant_media_table: string,
 }
 
 export interface Diseases {
@@ -62,4 +71,11 @@ export interface Invitation {
   id: string,
   tenant: string,
   email: string,
+}
+
+export interface TenantParticipant {
+  id: string,
+  user_id: string,
+  status: string,
+  role: string,
 }

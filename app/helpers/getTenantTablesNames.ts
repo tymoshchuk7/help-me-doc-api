@@ -7,4 +7,5 @@ export const getTenantTablesNames = (userId: string): ITableNames => ({
   chats_table: getTenantName(userId, 'chats'),
   messages_table: getTenantName(userId, 'messages'),
   chat_members_table: getTenantName(userId, 'chat_members'),
+  media_table: getTenantName(userId, 'media'),
 });
