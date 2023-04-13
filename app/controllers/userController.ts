@@ -11,17 +11,16 @@ class UserController {
     return user;
   }
 
-  async findOneById(id: string): Promise<User | undefined> {
-    const [user] = await db<User>(GlobalTableNames.users).where({ id });
-    return user;
-  }
-
   async findOne(condition: Partial<User>): Promise<User | undefined> {
     const [user] = await db<User>(GlobalTableNames.users).where(condition);
     return user;
   }
 
-  async updateOne(condition: Partial<User>, value: Partial<User>): Promise<User | undefined> {
+  async findOneById(id: string): Promise<User | undefined> {
+    return this.findOne({ id });
+  }
+
+  async update(condition: Partial<User>, value: Partial<User>): Promise<User | undefined> {
     const [user]: User[] = await db<User>(GlobalTableNames.users)
       .update(value)
       .where(condition)
