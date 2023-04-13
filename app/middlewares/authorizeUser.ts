@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { isEmpty } from 'lodash';
 import checkJWT from './checkJWT';
-import { db } from '../database';
+import { UserController } from '../controllers';
 import { AccessError, AuthRequest } from '../types';
 
 const getError = (statusCode: number, errorText: string, errorCode?: string | null): AccessError => {
@@ -39,13 +38,16 @@ export default (): [
       // eslint-disable-next-line @typescript-eslint/naming-convention
       email, meta_data: { first_name, last_name }, picture: avatar,
     } = (request as unknown as AuthRequest).auth;
-    const user = await db('users').where({ email });
+    const user = await UserController.findOne({ email });
 
-    if (isEmpty(user)) {
-      await db('users').insert({ email, first_name, last_name, avatar });
-      (request as unknown as AuthRequest).user = (await db('users').where({ email }))[0];
+    if (!user) {
+      (request as unknown as AuthRequest).user = await UserController.create({ email, first_name, last_name, avatar });
     } else {
-      (request as unknown as AuthRequest).user = user[0];
+      (request as unknown as AuthRequest).user = user;
+    }
+
+    if (!(request as unknown as AuthRequest)) {
+      return next(getError(404, 'User is malformed'));
     }
 
     next();
