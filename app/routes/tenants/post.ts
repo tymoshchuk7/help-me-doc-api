@@ -1,10 +1,9 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
-import { AuthRequest } from '../../types';
 import { createTenant } from '../../database';
 import { UserController, ParticipantController } from '../../controllers';
 
-export default asyncRoute(async (req: AuthRequest, res: Response) => {
+export default asyncRoute(async (req: Request, res: Response) => {
   const { user } = req;
 
   const tenant = await createTenant(user.id);

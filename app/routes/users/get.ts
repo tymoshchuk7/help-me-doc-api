@@ -1,6 +1,5 @@
-import { Response } from 'express';
-import { AuthRequest } from '../../types';
+import { Response, Request } from 'express';
 
-export default function (req: AuthRequest, res: Response) {
+export default function (req: Request, res: Response) {
   return res.json({ user: req.user });
 }

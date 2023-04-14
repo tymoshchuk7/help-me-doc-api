@@ -16,12 +16,6 @@ export interface AccessError extends Error {
   errorCode?: string;
 }
 
-export interface AuthRequest<B = any> {
-  body: B;
-  auth: IJwtUser;
-  user: User;
-}
-
 export interface ITableNames {
   participants_table: string,
   chats_table: string,

@@ -1,15 +1,13 @@
-import { NextFunction, Response } from 'express';
-
-import { AuthRequest } from '../types';
+import { NextFunction, Response, Request } from 'express';
 
 type ReturnType = Promise<void | Response> | void | Response;
 
 export default function asyncRoute(
   fn: (
-    req: AuthRequest, res: Response, next?: NextFunction
+    req: Request, res: Response, next?: NextFunction
   ) => ReturnType,
 ) {
-  return (req: AuthRequest, res: Response): ReturnType => Promise.resolve(
+  return (req: Request, res: Response): ReturnType => Promise.resolve(
     fn(req, res),
   ).catch((err: { errors?: [] }) => {
     // eslint-disable-next-line no-console
