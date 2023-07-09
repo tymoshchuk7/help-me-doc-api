@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authorizeUser } from '../../middlewares';
-import get from './get';
+import me from './me';
 
 export default Router()
-  .get('/', authorizeUser(), get);
+  .get('/', authorizeUser(), me);
