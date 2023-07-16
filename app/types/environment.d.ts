@@ -1,3 +1,5 @@
+import { IJwtUser, User } from '.';
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -13,6 +15,16 @@ declare global {
       AUTH0_JWKS_URI: string,
       AUTH0_AUDIENCE: string,
       AUTH0_ISSUER: string,
+
+      EMAIL_ADDRESS: string,
+      EMAIL_PASSWORD: string,
+    }
+  }
+
+  namespace Express {
+    interface Request {
+      auth: IJwtUser,
+      user: User,
     }
   }
 }
