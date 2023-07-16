@@ -1,7 +1,7 @@
 import { db } from '../database';
 import { Tenant, TenantParticipant, GlobalTableNames } from '../types';
 
-const participantsColumns = ['id, user_id', 'role', 'status'];
+// const participantsColumns = ['id, user_id', 'role', 'status'];
 
 class ParticipantController {
   async create(tenantId: string, userId: string, value = {}): Promise<TenantParticipant | undefined> {
@@ -28,14 +28,12 @@ class ParticipantController {
 
   async update(
     tenantId: string, condition: Partial<TenantParticipant>, value: Partial<TenantParticipant>,
-  ): Promise<TenantParticipant | undefined> {
+  ): Promise<number | undefined> {
     const [tenant] = await db<Tenant>(GlobalTableNames.tenants).where({ id: tenantId });
     if (tenant) {
-      const [participant]: TenantParticipant[] = await db(tenant.tenant_participants_table)
-        .update(value)
+      return db(tenant.tenant_participants_table)
         .where(condition as TenantParticipant)
-        .returning(participantsColumns);
-      return participant;
+        .update(value);
     }
   }
 }

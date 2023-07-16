@@ -52,7 +52,7 @@ export interface Tenant {
   tenant_media_table: string,
 }
 
-export interface Diseases {
+export interface Disease {
   id: string,
   user_id: string,
   name: string,
@@ -65,6 +65,7 @@ export interface Invitation {
   id: string,
   tenant: string,
   email: string,
+  role: string,
 }
 
 export interface TenantParticipant {

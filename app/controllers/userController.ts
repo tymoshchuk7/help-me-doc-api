@@ -20,12 +20,8 @@ class UserController {
     return this.findOne({ id });
   }
 
-  async update(condition: Partial<User>, value: Partial<User>): Promise<User | undefined> {
-    const [user]: User[] = await db<User>(GlobalTableNames.users)
-      .update(value)
-      .where(condition)
-      .returning(userColumns);
-    return user;
+  async update(condition: Partial<User>, value: Partial<User>): Promise<number> {
+    return db<User>(GlobalTableNames.users).where(condition).update(value);
   }
 }
 
