@@ -16,8 +16,8 @@ declare global {
       AUTH0_AUDIENCE: string,
       AUTH0_ISSUER: string,
 
-      EMAIL_ADDRESS: string,
-      EMAIL_PASSWORD: string,
+      SENDGRID_EMAIL: string,
+      SENDGRID_API_KEY: string,
     }
   }
 
