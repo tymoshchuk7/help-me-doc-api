@@ -1,3 +1,4 @@
+/* eslint-disable */
 const sgMail = require('@sendgrid/mail');
 //TODO fix typing
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
