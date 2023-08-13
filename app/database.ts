@@ -41,7 +41,6 @@ export const createTenant = async (userId: string) => {
 
       await db.schema.createTable(chats_table, (table) => {
         table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-        table.uuid('participant_id').references(`${participants_table}.id`).onDelete('CASCADE');
       }).transacting(trx);
 
       await db.schema.createTable(messages_table, (table) => {
@@ -55,7 +54,7 @@ export const createTenant = async (userId: string) => {
 
       await db.schema.createTable(media_table, (table) => {
         table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-        table.string('bucketPath');
+        table.string('bucket_path');
         table.uuid('message_id').references(`${messages_table}.id`).onDelete('CASCADE');
       }).transacting(trx);
 

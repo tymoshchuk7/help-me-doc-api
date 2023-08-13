@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import checkJWT from './checkJWT';
-import { UserController } from '../controllers';
+import { UserController, ParticipantController } from '../controllers';
 import { AccessError } from '../types';
 
 const getError = (statusCode: number, errorText: string, errorCode?: string | null): AccessError => {
@@ -41,6 +41,10 @@ export default (): [
       request.user = await UserController.create({ email, first_name, last_name, avatar });
     } else {
       request.user = user;
+      request.tenantParticipant = (
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await ParticipantController.findOne(user.defaultTenant, { user_id: user?.id })
+      ) ?? null;
     }
 
     if (!request.user) {

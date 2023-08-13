@@ -1,4 +1,4 @@
-import { IJwtUser, User } from '.';
+import { IJwtUser, User, TenantParticipant } from '.';
 
 declare global {
   namespace NodeJS {
@@ -25,6 +25,7 @@ declare global {
     interface Request {
       auth: IJwtUser,
       user: User,
+      tenantParticipant: TenantParticipant | null,
     }
   }
 }
