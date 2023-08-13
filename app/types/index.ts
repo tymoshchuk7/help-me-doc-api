@@ -74,3 +74,36 @@ export interface TenantParticipant {
   status: string,
   role: string,
 }
+
+export interface TenantChat {
+  id: string,
+  participant_id: string,
+}
+
+export interface TenantChatMember {
+  id: string,
+  participant_id: string,
+  chat_id: string,
+  user_id: string,
+}
+
+export interface TenantMessage {
+  id: string,
+  participant_id: string,
+  chat_id: string,
+  content: string,
+  sent_timestamp: string,
+}
+
+export interface TenantMedia {
+  id: string,
+  message_id: string,
+  bucket_name: string,
+}
+
+export interface ModelMeta {
+  id: string,
+  [key: string]: any,
+}
+
+export type TenantTableName = keyof Omit<Tenant, 'id' | 'tenant_name' | 'user_id'>;

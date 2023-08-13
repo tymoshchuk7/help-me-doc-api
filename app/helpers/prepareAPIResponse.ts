@@ -1,10 +1,6 @@
+import { ModelMeta } from '../types';
 
-interface Entity {
-  id: string,
-  [key: string]: any,
-}
-
-export default function prepareAPIResponse(data: Entity | Array<Entity>) {
+export default function prepareAPIResponse(data: ModelMeta | Array<ModelMeta>) {
   const response: Record<string, any> = {};
   const adjustedData = Array.isArray(data) ? data : [data];
 
