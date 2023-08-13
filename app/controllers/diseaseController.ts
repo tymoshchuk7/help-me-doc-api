@@ -1,28 +1,18 @@
-import { db } from '../database';
+import { Model } from './AbstractModel';
 import { Disease, GlobalTableNames } from '../types';
 
-const diseaseColumns = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'defaultTenant', 'avatar'];
+class DiseaseController extends Model<Disease> {
 
-class DiseaseController {
-  async create(value: Partial<Disease>): Promise<Disease> {
-    const [disease]: Disease[] = await db<Disease>(GlobalTableNames.diseases)
-      .insert(value)
-      .returning(diseaseColumns);
-    return disease;
+  tableName: GlobalTableNames;
+
+  columns: string[];
+
+  constructor() {
+    super();
+    this.tableName = GlobalTableNames.diseases;
+    this.columns = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'defaultTenant', 'avatar'];
   }
 
-  async findOne(condition: Partial<Disease>): Promise<Disease | undefined> {
-    const [disease] = await db<Disease>(GlobalTableNames.diseases).where(condition);
-    return disease;
-  }
-
-  async findOneById(id: string): Promise<Disease | undefined> {
-    return this.findOne({ id });
-  }
-
-  async update(condition: Partial<Disease>, value: Partial<Disease>): Promise<number> {
-    return db<Disease>(GlobalTableNames.diseases).where(condition).update(value);
-  }
 }
 
 export default new DiseaseController();

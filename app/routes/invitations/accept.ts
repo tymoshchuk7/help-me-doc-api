@@ -19,7 +19,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
     user_id: user.id,
   };
 
-  const participant = await ParticipantController.create(invitation.tenant, user.id, dto);
+  const participant = await ParticipantController.create(invitation.tenant, dto);
   await UserController.update({ id: user.id }, { defaultTenant: invitation.tenant });
 
   if (!participant) {

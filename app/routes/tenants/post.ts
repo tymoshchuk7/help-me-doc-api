@@ -12,7 +12,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
     throw new Error('Tenant has not being created');
   }
   await UserController.update({ id: user.id }, { defaultTenant: tenant.id });
-  const participant = await ParticipantController.create(tenant.id, user.id, { role: 'chief', user_id: user.id });
+  const participant = await ParticipantController.create(tenant.id, { role: 'chief', user_id: user.id });
 
   if (!participant) {
     throw new Error('Participant has not being created');
