@@ -1,10 +1,11 @@
 import { Response, Request } from 'express';
 import { asyncRoute, sendEmail, prepareAPIResponse } from '../../helpers';
 import { InvitationController, UserController } from '../../controllers';
+import { TRole } from '../../types';
 
 interface Body {
   email: string,
-  role: string,
+  role: TRole,
 }
 
 export default asyncRoute(async (req: Request<object, object, Body>, res: Response) => {

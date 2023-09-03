@@ -1,3 +1,6 @@
+
+export type TRole = 'chief' | 'patient' | 'doctor' | 'admin';
+
 export interface IJwtUser {
   meta_data: {
     first_name: string;
@@ -65,14 +68,14 @@ export interface Invitation {
   id: string,
   tenant: string,
   email: string,
-  role: string,
+  role: TRole,
 }
 
 export interface TenantParticipant {
   id: string,
   user_id: string,
   status: string,
-  role: string,
+  role: TRole,
 }
 
 export interface TenantChat {
