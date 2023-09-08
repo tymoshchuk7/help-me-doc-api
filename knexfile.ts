@@ -13,6 +13,12 @@ const config: { [key: string]: Knex.Config } = {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
     },
+    seeds: {
+      directory: './seeds',
+    },
+    migrations: {
+      directory: './migrations',
+    },
   },
 };
 

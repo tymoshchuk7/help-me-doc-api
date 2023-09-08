@@ -4,8 +4,9 @@
   "description": "",
   "main": "app/index.js",
   "scripts": {
-    "migrate": "NODE_ENV=development knex migrate:latest",
-    "migrate-rollback": "NODE_ENV=development knex migrate:rollback",
+    "db:migrate": "NODE_ENV=development knex migrate:latest",
+    "db:migrate-rollback": "NODE_ENV=development knex migrate:rollback",
+    "db:seed": "NODE_ENV=development knex seed:run",
     "start": "NODE_ENV=development npx ts-node-dev --unhandled-rejections=strict -r dotenv/config --files .",
     "lint": "eslint --ext .ts,.tsx ./",
     "lint-fix": "npm run lint-pure -- --fix",

@@ -61,7 +61,6 @@
   },
   "exclude": [
     "./node_modules/*",
-//    "./app/helpers/sendEmail.ts",
   ]
   
 }
