@@ -1,6 +1,6 @@
-import { knex } from 'knex';
+import { knex, Knex } from 'knex';
 import { getTenantTablesNames } from './helpers';
-import { Tenant } from './types';
+import { Tenant, GlobalTableNames } from './types';
 
 export const db = knex( {
   client: 'pg',
@@ -13,62 +13,110 @@ export const db = knex( {
   },
 });
 
+export abstract class CreateTenantTables {
+  database: Knex<any, unknown[]>;
+
+  constructor(database: Knex<any, unknown[]>) {
+    this.database = database;
+  }
+
+  protected async createTenantParticipantsTable(tenant: Tenant, ctx: any) {
+    await this.database.schema.createTable(tenant.tenant_participants_table, (table) => {
+      table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
+      table.uuid('user_id').references('users.id').onDelete('CASCADE');
+      table.string('status');
+      table.string('role');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    }).transacting(ctx);
+  }
+
+  protected async createTenantChatsTable(tenant: Tenant, ctx: any) {
+    await this.database.schema.createTable(tenant.tenant_chats_table, (table) => {
+      table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    }).transacting(ctx);
+  }
+
+  protected async createTenantMessagesTable(tenant: Tenant, ctx: any) {
+    await this.database.schema.createTable(tenant.tenant_messages_table, (table) => {
+      table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
+      table.uuid('participant_id').references(`${tenant.tenant_participants_table}.id`).onDelete('CASCADE');
+      table.uuid('chat_id').references(`${tenant.tenant_chats_table}.id`).onDelete('CASCADE');
+
+      table.text('content');
+      table.date('sent_timestamp');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    }).transacting(ctx);
+  }
+
+  protected async createTenantMediaTable(tenant: Tenant, ctx: any) {
+    await this.database.schema.createTable(tenant.tenant_media_table, (table) => {
+      table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
+      table.string('bucket_path');
+      table.uuid('message_id').references(`${tenant.tenant_messages_table}.id`).onDelete('CASCADE');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    }).transacting(ctx);
+  }
+
+  protected async createTenantChatMembersTable(tenant: Tenant, ctx: any) {
+    await this.database.schema.createTable(tenant.tenant_chats_members_table, (table) => {
+      table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
+      table.uuid('participant_id').references(`${tenant.tenant_participants_table}.id`);
+      table.uuid('user_id').references('users.id').onDelete('CASCADE');
+      table.uuid('chat_id').references(`${tenant.tenant_chats_table}.id`).onDelete('CASCADE');
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    }).transacting(ctx);
+  }
+
+}
+
+class CreateTenant extends CreateTenantTables {
+  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+  constructor(database: Knex<any, unknown[]>) {
+    super(database);
+  }
+
+  async createTenant(tenantDTO: Partial<Tenant>) {
+    await this.database.transaction(async (ctx) => {
+      try {
+        const [tenant]: Tenant[] = await this.database(GlobalTableNames.tenants)
+          .insert(tenantDTO)
+          .returning([
+            'tenant_participants_table',
+            'tenant_chats_table',
+            'tenant_messages_table',
+            'tenant_chats_members_table',
+            'tenant_media_table',
+          ])
+          .transacting(ctx);
+
+        await this.createTenantParticipantsTable(tenant, ctx);
+        await this.createTenantChatsTable(tenant, ctx);
+        await this.createTenantMessagesTable(tenant, ctx);
+        await this.createTenantMediaTable(tenant, ctx);
+        await this.createTenantChatMembersTable(tenant, ctx);
+
+        await ctx.commit();
+      } catch (e) {
+        console.error(e);
+        await ctx.rollback();
+      }
+    });
+  }
+}
+
 export const createTenant = async (userId: string) => {
   const tenantName = `tenant-${userId}`;
-  const {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    participants_table, chats_table, messages_table, chat_members_table, media_table,
-  } = getTenantTablesNames(userId);
+  const tableNames = getTenantTablesNames(userId);
 
-  await db.transaction(async (trx) => {
-    try {
-      await db<Tenant>('tenants').insert({
-        tenant_name: tenantName,
-        user_id: userId,
-        tenant_participants_table: participants_table,
-        tenant_chats_table: chats_table,
-        tenant_messages_table: messages_table,
-        tenant_chats_members_table: chat_members_table,
-        tenant_media_table: media_table,
-      }).transacting(trx);
-
-      await db.schema.createTable(participants_table, (table) => {
-        table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-        table.uuid('user_id').references('users.id').onDelete('CASCADE');
-        table.string('status');
-        table.string('role');
-      }).transacting(trx);
-
-      await db.schema.createTable(chats_table, (table) => {
-        table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-      }).transacting(trx);
-
-      await db.schema.createTable(messages_table, (table) => {
-        table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-        table.uuid('participant_id').references(`${participants_table}.id`).onDelete('CASCADE');
-        table.uuid('chat_id').references(`${chats_table}.id`).onDelete('CASCADE');
-
-        table.text('content');
-        table.date('sent_timestamp');
-      }).transacting(trx);
-
-      await db.schema.createTable(media_table, (table) => {
-        table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-        table.string('bucket_path');
-        table.uuid('message_id').references(`${messages_table}.id`).onDelete('CASCADE');
-      }).transacting(trx);
-
-      await db.schema.createTable(chat_members_table, (table) => {
-        table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-        table.uuid('participant_id').references(`${participants_table}.id`);
-        table.uuid('user_id').references('users.id').onDelete('CASCADE');
-        table.uuid('chat_id').references(`${chats_table}.id`).onDelete('CASCADE');
-      }).transacting(trx);
-
-      await trx.commit();
-    } catch (e) {
-      await trx.rollback();
-    }
+  const createTenantClient = new CreateTenant(db);
+  await createTenantClient.createTenant({
+    tenant_name: tenantName,
+    tenant_participants_table: tableNames.participants_table,
+    tenant_chats_table: tableNames.chats_table,
+    tenant_messages_table: tableNames.messages_table,
+    tenant_chats_members_table: tableNames.chat_members_table,
+    tenant_media_table: tableNames.media_table,
   });
 
   const [newTenant] = await db<Tenant>('tenants').where({ tenant_name: tenantName });
