@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import checkJWT from './checkJWT';
 import { UserController, ParticipantController } from '../controllers';
 import { AccessError } from '../types';
+import commonErrorCatchMiddleware from './commonErrorCatchMiddleware';
 
 const getError = (statusCode: number, errorText: string, errorCode?: string | null): AccessError => {
   const error = new Error(errorText) as AccessError;
@@ -53,18 +54,5 @@ export default (): [
 
     next();
   },
-  (
-    err: AccessError,
-    req: Request,
-    res: Response,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    next: NextFunction,
-  ) => {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    res.status(err.statusCode ?? 401).json({
-      error: err.name,
-      errorDescription: err.message,
-    });
-  },
+  commonErrorCatchMiddleware,
 ];

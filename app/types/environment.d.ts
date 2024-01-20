@@ -2,8 +2,10 @@ import { IJwtUser, User, TenantParticipant } from '.';
 
 declare global {
   namespace NodeJS {
-    interface ProcessEnv {
+    export interface ProcessEnv {
       APP_URL: string,
+      API_THROTTLE_RATE: string,
+      REDIS_URL: string,
 
       DB_HOST: string,
       DB_PORT: string,
