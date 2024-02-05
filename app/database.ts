@@ -1,15 +1,16 @@
 import { knex, Knex } from 'knex';
 import { getTenantTablesNames } from './helpers';
+import { config } from './config';
 import { Tenant, GlobalTableNames } from './types';
 
 export const db = knex( {
   client: 'pg',
   connection: {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
+    host: config.dbHost,
+    port: config.dbPort,
+    database: config.dbName,
+    user: config.dbUser,
+    password: config.dbPassword,
   },
 });
 

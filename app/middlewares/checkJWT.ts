@@ -1,13 +1,14 @@
 import { expressjwt as jwt } from 'express-jwt';
 import jwks from 'jwks-rsa';
+import { config } from '../config';
 
 export default jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: process.env.AUTH0_JWKS_URI,
+    jwksUri: config.auth0JwksUri,
   }) as jwks.GetVerificationKey,
-  issuer: process.env.AUTH0_ISSUER,
+  issuer: config.auth0Issuer,
   algorithms: ['RS256'],
 });

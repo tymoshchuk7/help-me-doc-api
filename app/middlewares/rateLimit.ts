@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import Redis from 'ioredis';
-import { AccessError } from '../types';
 import commonErrorCatchMiddleware from './commonErrorCatchMiddleware';
+import { config } from '../config';
+import { AccessError } from '../types';
 
-const redis = new Redis(process.env.REDIS_URL);
+const redis = new Redis(config.redisUrl);
 
 interface Params {
   rate: string,
