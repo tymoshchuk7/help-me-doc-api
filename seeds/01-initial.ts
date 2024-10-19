@@ -35,6 +35,7 @@ class CreateInitialData extends CreateTenantTables {
           .insert({
             id: hardcodedTenantId,
             user_id: userId,
+            name: 'Test',
             tenant_name: tenantName,
             tenant_participants_table: tableNames.participants_table,
             tenant_chats_table: tableNames.chats_table,

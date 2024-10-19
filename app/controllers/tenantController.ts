@@ -13,6 +13,7 @@ class TenantController extends Model<Tenant> {
     this.columns = [
       'id',
       'user_id',
+      'name',
       'tenant_name',
       'tenant_participants_table',
       'tenant_chats_table',
