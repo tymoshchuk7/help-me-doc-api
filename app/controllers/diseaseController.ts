@@ -10,7 +10,7 @@ class DiseaseController extends Model<Disease> {
   constructor() {
     super();
     this.tableName = GlobalTableNames.diseases;
-    this.columns = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'defaultTenant', 'avatar'];
+    this.columns = ['id', 'user_id', 'name', 'status', 'description', 'treatment'];
   }
 
 }
