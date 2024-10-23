@@ -6,7 +6,7 @@ This project is a Node.js server using Express.js, PostgreSQL and Redis, with au
 
 For development, run the following:
 1. Install dependencies `npm run install`
-2. Set up PostgreSQL and create `help-me-doc` database
+2. Set up PostgreSQL and create `help-me-doc` database. Also, install create extension "uuid-ossp" for the database  
 3. Set up Auth0 (Create app and generate credentials)
 4. Set up Sendgrid for sending email (Create app and generate credentials)
 5. Create and set up .env file according to `.example.env` file
