@@ -36,7 +36,7 @@ export enum GlobalTableNames {
 
 export interface User {
   id: string,
-  defaultTenant: string,
+  default_tenant: string,
   email: string,
   avatar: string,
   last_name: string,

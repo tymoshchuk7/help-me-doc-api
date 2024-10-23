@@ -25,7 +25,7 @@ class CreateInitialData extends CreateTenantTables {
           email: 'test@gmail.com',
           first_name: 'cool',
           last_name: 'doctor',
-          defaultTenant: hardcodedTenantId,
+          default_tenant: hardcodedTenantId,
         }).returning('id').transacting(ctx);
 
         const tenantName = `tenant-${userId}`;
@@ -80,17 +80,17 @@ class CreateInitialData extends CreateTenantTables {
       email: 'placeholder1@gmail.com',
       first_name: 'placeholder1',
       last_name: 'user1',
-      defaultTenant: hardcodedTenantId,
+      default_tenant: hardcodedTenantId,
     }, {
       email: 'placeholder2@gmail.com',
       first_name: 'placeholder2',
       last_name: 'user2',
-      defaultTenant: hardcodedTenantId,
+      default_tenant: hardcodedTenantId,
     }, {
       email: 'placeholder3@gmail.com',
       first_name: 'placeholder3',
       last_name: 'user3',
-      defaultTenant: hardcodedTenantId,
+      default_tenant: hardcodedTenantId,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     }]).returning('id').transacting(ctx);
   }

@@ -10,7 +10,7 @@ class UserController extends Model<User> {
   constructor() {
     super();
     this.tableName = GlobalTableNames.users;
-    this.columns = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'defaultTenant', 'avatar'];
+    this.columns = ['id', 'email', 'first_name', 'last_name', 'phone_number', 'default_tenant', 'avatar'];
   }
 
 }
