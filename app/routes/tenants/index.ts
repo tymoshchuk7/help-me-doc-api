@@ -1,9 +1,9 @@
 import { Response, Router, Request } from 'express';
-import { checkSchema } from 'express-validator';
-import { authorizeUser } from '../../middlewares';
+import { Schema } from 'express-validator';
+import { authenticateUser, validate } from '../../middlewares';
 import post from './post';
 
-const validateTenant = () => checkSchema({
+const tenantValidationSchema: Schema = {
   'data.name': {
     errorMessage: 'Tenant name is invalid',
     notEmpty: true,
@@ -14,7 +14,7 @@ const validateTenant = () => checkSchema({
       options: /^[a-zA-Z0-9.,/ ]+$/,
     },
   },
-});
+};
 
 export default Router()
-  .post('/', authorizeUser({}), validateTenant(), (req: Request, res: Response) => void post(req, res));
+  .post('/', authenticateUser(), ...validate(tenantValidationSchema), (req: Request, res: Response) => void post(req, res));

@@ -34,4 +34,8 @@ export abstract class Model<T extends ModelMeta> {
   async delete(condition: T): Promise<void> {
     return db(this.tableName).where(condition).del();
   }
+
+  query() {
+    return db(this.tableName);
+  }
 }

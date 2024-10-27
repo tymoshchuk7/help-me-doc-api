@@ -3,14 +3,19 @@ import { asyncRoute } from '../../helpers';
 import { createTenant } from '../../database';
 import { UserController, ParticipantController } from '../../controllers';
 
-export default asyncRoute(async (req: Request, res: Response) => {
+interface Body {
+  data: { name: string },
+}
+
+export default asyncRoute(async (req: Request<object, object, Body>, res: Response) => {
   const { user } = req;
+  const { data: { name } } = req.body;
 
   if (user.default_tenant) {
     throw new Error('User already has related tenant');
   }
 
-  const tenant = await createTenant(user.id);
+  const tenant = await createTenant(user.id, name);
   if (!tenant) {
     throw new Error('Tenant has not been created');
   }
@@ -22,7 +27,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
     throw new Error('Participant has not been created');
   }
 
-  const updatedUser = await UserController.findOneById(user.id);
+  const updatedUser = await UserController.findUserJoiningParticipant(user.id);
 
   return res.json({ tenant, user: updatedUser });
 });

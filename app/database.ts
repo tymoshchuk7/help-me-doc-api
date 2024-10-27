@@ -106,12 +106,14 @@ class CreateTenant extends CreateTenantTables {
   }
 }
 
-export const createTenant = async (userId: string) => {
+export const createTenant = async (userId: string, name: string) => {
   const tenantName = `tenant-${userId}`;
   const tableNames = getTenantTablesNames(userId);
 
   const createTenantClient = new CreateTenant(db);
   await createTenantClient.createTenant({
+    name,
+    user_id: userId,
     tenant_name: tenantName,
     tenant_participants_table: tableNames.participants_table,
     tenant_chats_table: tableNames.chats_table,
