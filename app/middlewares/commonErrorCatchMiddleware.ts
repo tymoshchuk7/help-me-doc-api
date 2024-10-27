@@ -10,7 +10,7 @@ export default function commonErrorCatchMiddleware(
 ) {
   // eslint-disable-next-line no-console
   console.error(err);
-  res.status(err.statusCode ?? 500).json({
+  res.status(err.statusCode ?? 401).json({
     error: err.name,
     errorDescription: err.message,
   });
