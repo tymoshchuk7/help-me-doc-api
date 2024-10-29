@@ -1,30 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import checkJWT from './checkJWT';
 import { UserController } from '../controllers';
+import { ApiError } from '../utils';
 import { AccessError } from '../types';
-import commonErrorCatchMiddleware from './commonErrorCatchMiddleware';
-
-const getError = (statusCode: number, errorText: string, errorCode?: string | null): AccessError => {
-  const error = new Error(errorText) as AccessError;
-  error.statusCode = statusCode;
-  if (errorCode) {
-    error.errorCode = errorCode;
-  }
-  return error;
-};
 
 export default (): [
   (req: Request, res: Response, next: NextFunction) => Promise<unknown>,
-  (
-    request: Request,
-    res: Response,
-    next: NextFunction,
-  ) => Promise<unknown>,
-  (
-  err: AccessError,
-  req: Request,
-  res: Response,
-  next: NextFunction) => void,
+  (req: Request, res: Response, next: NextFunction) => Promise<unknown>,
 ] => [
   checkJWT,
   async (
@@ -33,6 +15,9 @@ export default (): [
     next: NextFunction,
   ) => {
     try {
+      if (!request.auth) {
+        return next(new ApiError({ message: 'Unauthorized', statusCode: 401 }));
+      }
       const {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         email, meta_data: { first_name, last_name }, picture: avatar,
@@ -46,7 +31,7 @@ export default (): [
       }
 
       if (!request.user) {
-        return next(getError(404, 'User is malformed'));
+        return next(new ApiError({ message: 'User is malformed', statusCode: 404 }));
       }
       next();
     } catch (e) {
@@ -55,5 +40,4 @@ export default (): [
       next(error);
     }
   },
-  commonErrorCatchMiddleware,
 ];
