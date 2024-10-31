@@ -41,6 +41,7 @@ module.exports = {
         '@typescript-eslint/ban-ts-comment': 'warn',
         '@typescript-eslint/no-unsafe-assignment': 'warn',
         '@typescript-eslint/no-unsafe-call': 'warn',
+        '@typescript-eslint/no-misused-promises': 'warn',
     },
     settings: {
       "import/resolver": {
