@@ -59,9 +59,9 @@ class UserController extends Model<User> {
       avatar: result.avatar,
       default_tenant: result.default_tenant,
       participant: {
-        participant_id: result.participant_id,
-        participant_status: result.participant_status,
-        participant_role: result.participant_role,
+        id: result.participant_id,
+        status: result.participant_status,
+        role: result.participant_role,
       },
     };
 
