@@ -1,5 +1,9 @@
-
 export type TRole = 'chief' | 'patient' | 'doctor' | 'admin';
+
+export enum Permissions {
+  CAN_INVITE_USERS = 'CAN_INVITE_USERS',
+  CAN_SEE_INVITATIONS = 'CAN_SEE_INVITATIONS',
+}
 
 export interface IJwtUser {
   meta_data: {
