@@ -8,7 +8,6 @@ interface Params {
   to: string,
   from: string,
   invitationId: string,
-  isUserExists: boolean,
 }
 
 const emailContent = (from: string, urlLink: string) => (
@@ -18,15 +17,13 @@ const emailContent = (from: string, urlLink: string) => (
   </div>`
 );
 
-const getInvitationUrl = (invitationId: string, isUserExists: boolean) => (
-  `${config.appUrl}/invitation/${invitationId}?userExists=${isUserExists}`
-);
+const getInvitationUrl = (invitationId: string) => `${config.appUrl}/invitation/${invitationId}`;
 
-export default async function sendEmail({ to, invitationId, from, isUserExists }: Params) {
+export default async function sendEmail({ to, invitationId, from }: Params) {
   return sgMail.send({
     to,
     from: config.sendgridEmail,
     subject: `${from} invites you to tenant`,
-    html: emailContent(from, getInvitationUrl(invitationId, isUserExists)),
+    html: emailContent(from, getInvitationUrl(invitationId)),
   });
 }

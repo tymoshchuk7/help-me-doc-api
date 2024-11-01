@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import { asyncRoute, sendEmail } from '../../helpers';
-import { InvitationController, UserController } from '../../controllers';
+import { InvitationController } from '../../controllers';
 import { TRole } from '../../types';
 
 interface Body {
@@ -20,14 +20,15 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     throw new Error('Invitation has not been created');
   }
 
-  const invitedUser = await UserController.findOne({ email });
-
-  await sendEmail({
-    from: user.email,
-    to: email,
-    invitationId: invitation.id,
-    isUserExists: !!invitedUser,
-  });
+  try {
+    await sendEmail({
+      from: user.email,
+      to: email,
+      invitationId: invitation.id,
+    });
+  } catch (e) {
+    console.error(e);
+  }
 
   return res.json({
     invitations: [invitation],
