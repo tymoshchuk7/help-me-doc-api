@@ -21,20 +21,32 @@ class CreateInitialData extends CreateTenantTables {
   async createInitialTenant() {
     await this.database.transaction(async (ctx) => {
       try {
-        const [{ id: userId }]: User[] = await this.database(GlobalTableNames.users).insert({
-          email: 'test@gmail.com',
-          first_name: 'cool',
-          last_name: 'doctor',
+        const [{ id: ownerUserId }]: User[] = await this.database(GlobalTableNames.users).insert({
+          email: 'testowner@gmail.com',
+          first_name: 'test',
+          last_name: 'owner',
+          default_tenant: hardcodedTenantId,
+        }).returning('id').transacting(ctx);
+        const [{ id: adminUserId }]: User[] = await this.database(GlobalTableNames.users).insert({
+          email: 'testadmin@gmail.com',
+          first_name: 'test',
+          last_name: 'admin',
+          default_tenant: hardcodedTenantId,
+        }).returning('id').transacting(ctx);
+        const [{ id: docUserId }]: User[] = await this.database(GlobalTableNames.users).insert({
+          email: 'testdoc@gmail.com',
+          first_name: 'test',
+          last_name: 'doc',
           default_tenant: hardcodedTenantId,
         }).returning('id').transacting(ctx);
 
-        const tenantName = `tenant-${userId}`;
-        const tableNames = getTenantTablesNames(userId);
+        const tenantName = `tenant-${ownerUserId}`;
+        const tableNames = getTenantTablesNames(ownerUserId);
 
         const [tenant]: Tenant[] = await this.database(GlobalTableNames.tenants)
           .insert({
             id: hardcodedTenantId,
-            user_id: userId,
+            user_id: ownerUserId,
             name: 'Test',
             tenant_name: tenantName,
             tenant_participants_table: tableNames.participants_table,
@@ -59,7 +71,11 @@ class CreateInitialData extends CreateTenantTables {
         const participantsDTO = (createdUsers as User[]).map(
           (createdUser) => ({ userId: createdUser.id, role: 'patient' }),
         );
-        participantsDTO.push({ role: 'chief', userId });
+        participantsDTO.push(
+          { role: 'chief', userId: ownerUserId },
+          { role: 'admin', userId: adminUserId },
+          { role: 'doctor', userId: docUserId },
+        );
         await this.createInitialParticipants(tenant.tenant_participants_table, participantsDTO, ctx);
 
         await this.createTenantChatsTable(tenant, ctx);
@@ -77,19 +93,19 @@ class CreateInitialData extends CreateTenantTables {
 
   private async createInitialUsers(ctx: any) {
     return this.database(GlobalTableNames.users).insert([{
-      email: 'placeholder1@gmail.com',
-      first_name: 'placeholder1',
-      last_name: 'user1',
+      email: 'testclient@gmail.com',
+      first_name: 'test',
+      last_name: 'client',
       default_tenant: hardcodedTenantId,
     }, {
-      email: 'placeholder2@gmail.com',
-      first_name: 'placeholder2',
-      last_name: 'user2',
+      email: 'testclient2@gmail.com',
+      first_name: 'test',
+      last_name: 'client2',
       default_tenant: hardcodedTenantId,
     }, {
-      email: 'placeholder3@gmail.com',
-      first_name: 'placeholder3',
-      last_name: 'user3',
+      email: 'testclient3@gmail.com',
+      first_name: 'test',
+      last_name: 'client3',
       default_tenant: hardcodedTenantId,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     }]).returning('id').transacting(ctx);
