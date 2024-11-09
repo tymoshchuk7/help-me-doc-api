@@ -19,6 +19,7 @@ export default function checkParticipantPermissions(permissions: Permissions[]) 
       if (!participant) {
         return next(new ApiError({ message: 'Participant is missing.', statusCode: 404 }));
       }
+      req.tenantParticipant = participant;
 
       const hasPermissions = permissions.every((permission) => ROLE_PERMISSIONS[participant.role].has(permission));
       if (!hasPermissions) {

@@ -64,4 +64,13 @@ export abstract class TenantModel<T extends ModelMeta> {
     const tableName = tenant[this.tenantTableName];
     return db(tableName).where(condition).del();
   }
+
+  /*
+    query method necessary should be not async
+    https://stackoverflow.com/questions/65319822/how-does-knex-await-execute-a-database-query
+  */
+  query(tenant: Tenant) {
+    const tableName = tenant[this.tenantTableName];
+    return db(tableName);
+  }
 }

@@ -3,6 +3,8 @@ export type TRole = 'chief' | 'patient' | 'doctor' | 'admin';
 export enum Permissions {
   CAN_INVITE_USERS = 'CAN_INVITE_USERS',
   CAN_SEE_INVITATIONS = 'CAN_SEE_INVITATIONS',
+  CAN_SEND_MESSAGES = 'CAN_SEND_MESSAGES',
+  CAN_CREATE_DISEASES = 'CAN_CREATE_DISEASES',
 }
 
 export interface IJwtUser {
