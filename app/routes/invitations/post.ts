@@ -16,10 +16,6 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
 
   const invitation = await InvitationController.create({ email, role, tenant: user.default_tenant });
 
-  if (!invitation) {
-    throw new Error('Invitation has not been created');
-  }
-
   try {
     await sendEmail({
       from: user.email,
