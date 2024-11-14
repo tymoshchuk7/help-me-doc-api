@@ -79,9 +79,9 @@ class CreateInitialData extends CreateTenantTables {
         await this.createInitialParticipants(tenant.tenant_participants_table, participantsDTO, ctx);
 
         await this.createTenantChatsTable(tenant, ctx);
+        await this.createTenantChatMembersTable(tenant, ctx);
         await this.createTenantMessagesTable(tenant, ctx);
         await this.createTenantMediaTable(tenant, ctx);
-        await this.createTenantChatMembersTable(tenant, ctx);
 
         await ctx.commit();
       } catch (e) {

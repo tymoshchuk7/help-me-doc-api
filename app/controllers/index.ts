@@ -6,3 +6,4 @@ export { default as TenantController } from './tenantController';
 export { default as ParticipantController } from './participantController';
 export { default as ChatController } from './chatController';
 export { default as ChatMemberController } from './chatMemberController';
+export { default as ChatMessageController } from './messageController';

@@ -43,7 +43,7 @@ export abstract class CreateTenantTables {
       table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
       table.uuid('participant_id').references(`${tenant.tenant_participants_table}.id`).onDelete('CASCADE').notNullable();
       table.uuid('chat_id').references(`${tenant.tenant_chats_table}.id`).onDelete('CASCADE').notNullable();
-
+      table.uuid('chat_member_id').references(`${tenant.tenant_chats_members_table}.id`).onDelete('CASCADE').notNullable();
       table.text('content').notNullable();
       table.date('sent_timestamp');
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

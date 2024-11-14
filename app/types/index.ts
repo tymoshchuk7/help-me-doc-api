@@ -100,6 +100,7 @@ export interface TenantChatMember {
 export interface TenantMessage {
   id: string,
   participant_id: string,
+  chat_member_id: string,
   chat_id: string,
   content: string,
   sent_timestamp: string,
