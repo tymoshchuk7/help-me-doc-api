@@ -74,5 +74,5 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     sent_timestamp: new Date().toISOString(),
   });
 
-  return res.json({ chatId: chat.id });
+  return res.json({ chat });
 });
