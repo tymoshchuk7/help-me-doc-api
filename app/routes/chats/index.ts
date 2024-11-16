@@ -8,6 +8,7 @@ import { Permissions } from '../../types';
 import getAvailableContacts from './getAvailableContacts';
 import post from './post';
 import get from './get';
+import retrieve from './retrieve';
 
 const messageValidationSchema: Schema = {
   'data.participantRecipientId': {
@@ -42,4 +43,10 @@ export default Router()
     authenticateUser(),
     checkParticipantPermissions([Permissions.CAN_SEND_MESSAGES]),
     (req: Request, res: Response) => void get(req, res),
+  )
+  .get(
+    '/:id',
+    authenticateUser(),
+    checkParticipantPermissions([Permissions.CAN_SEND_MESSAGES]),
+    (req: Request, res: Response) => void retrieve(req, res),
   );
