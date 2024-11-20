@@ -30,8 +30,10 @@ export default asyncRoute(async (req: Request, res: Response) => {
     .join(`${GlobalTableNames.users} as user2`, 'participant2.user_id', 'user2.id')
     .select(
       `${tenant.tenant_chats_table}.id`,
-      'tcm1.participant_id as me_participant',
+      'tcm1.participant_id as me_participant_id',
+      'tcm1.id as me_chat_member_id',
       'tcm2.participant_id as chat_partner_participant_id',
+      'tcm2.id as chat_partner_chat_member_id',
       'user2.first_name as chat_partner_first_name',
       'user2.last_name as chat_partner_last_name',
       'user2.avatar as chat_partner_avatar',
