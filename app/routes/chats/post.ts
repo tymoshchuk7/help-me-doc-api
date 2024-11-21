@@ -42,14 +42,10 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     throw new Error('Tenant chat is missing');
   }
 
-  const senderChatMember = await ChatMemberController.create(
-    user.default_tenant,
-    {
-      participant_id: tenantParticipant.id,
-      chat_id: chat.id,
-      user_id: user.id,
-    },
-  );
+  const senderChatMember = await ChatMemberController.create(user.default_tenant, {
+    participant_id: tenantParticipant.id,
+    chat_id: chat.id,
+  });
 
   const participantRecipient = await ParticipantController.findOneById(user.default_tenant, participantRecipientId);
 
@@ -57,17 +53,12 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     throw new Error('Tenant recipient is missing');
   }
 
-  await ChatMemberController.create(
-    user.default_tenant,
-    {
-      participant_id: participantRecipient.id,
-      chat_id: chat.id,
-      user_id: participantRecipient.user_id,
-    },
-  );
+  await ChatMemberController.create(user.default_tenant, {
+    participant_id: participantRecipient.id,
+    chat_id: chat.id,
+  });
 
   await ChatMessageController.create(user.default_tenant, {
-    participant_id: tenantParticipant.id,
     chat_id: chat.id,
     chat_member_id: senderChatMember?.id,
     content,

@@ -41,11 +41,10 @@ export abstract class CreateTenantTables {
   protected async createTenantMessagesTable(tenant: Tenant, ctx: any) {
     await this.database.schema.createTable(tenant.tenant_messages_table, (table) => {
       table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
-      table.uuid('participant_id').references(`${tenant.tenant_participants_table}.id`).onDelete('CASCADE').notNullable();
       table.uuid('chat_id').references(`${tenant.tenant_chats_table}.id`).onDelete('CASCADE').notNullable();
       table.uuid('chat_member_id').references(`${tenant.tenant_chats_members_table}.id`).onDelete('CASCADE').notNullable();
       table.text('content').notNullable();
-      table.date('sent_timestamp');
+      table.date('sent_timestamp').notNullable();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     }).transacting(ctx);
   }
@@ -63,7 +62,6 @@ export abstract class CreateTenantTables {
     await this.database.schema.createTable(tenant.tenant_chats_members_table, (table) => {
       table.uuid('id', { primaryKey: true }).defaultTo(this.database.raw('uuid_generate_v4()'));
       table.uuid('participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
-      table.uuid('user_id').references('users.id').onDelete('CASCADE').notNullable();
       table.uuid('chat_id').references(`${tenant.tenant_chats_table}.id`).onDelete('CASCADE').notNullable();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     }).transacting(ctx);

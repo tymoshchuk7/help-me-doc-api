@@ -87,19 +87,16 @@ export interface TenantParticipant {
 
 export interface TenantChat {
   id: string,
-  participant_id: string,
 }
 
 export interface TenantChatMember {
   id: string,
   participant_id: string,
   chat_id: string,
-  user_id: string,
 }
 
 export interface TenantMessage {
   id: string,
-  participant_id: string,
   chat_member_id: string,
   chat_id: string,
   content: string,
