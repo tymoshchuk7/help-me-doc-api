@@ -1,23 +1,17 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
-import {
-  ChatMessageController, TenantController, ChatController,
-} from '../../controllers';
 import { GlobalTableNames } from '../../types';
 
 export default asyncRoute(async (req: Request, res: Response) => {
-  const { user, tenantParticipant, params: { id } } = req;
+  const { tenantParticipant, params: { id }, tenant } = req;
 
   if (!tenantParticipant) {
     throw new Error('Tenant participant is missing');
   }
 
-  const tenant = await TenantController.findOneById(user.default_tenant);
-  if (!tenant) {
-    throw new Error('Tenant is missing');
-  }
+  const { ChatController, ChatMessageController } = tenant;
 
-  const chatQueryObject = ChatController.query(tenant);
+  const chatQueryObject = ChatController.query();
   const chat = await chatQueryObject
     .join(`${tenant.tenant_chats_members_table} as tcm1`, `${tenant.tenant_chats_table}.id`, 'tcm1.chat_id')
     .join(`${tenant.tenant_chats_members_table} as tcm2`, `${tenant.tenant_chats_table}.id`, 'tcm2.chat_id')
@@ -44,7 +38,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
     throw new Error('Chat is missing');
   }
 
-  const messageQueryObject = ChatMessageController.query(tenant);
+  const messageQueryObject = ChatMessageController.query();
   const messages = await messageQueryObject
     .join(`${tenant.tenant_chats_members_table} as tcm`, `${tenant.tenant_messages_table}.chat_member_id`, 'tcm.id')
     .join(`${tenant.tenant_participants_table} as tp`, 'tcm.participant_id', 'tp.id')

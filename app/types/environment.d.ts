@@ -1,4 +1,5 @@
 import { IJwtUser, User, TenantParticipant } from '.';
+import { TenantControllerSet } from '../controllers';
 
 declare global {
   namespace NodeJS {
@@ -27,7 +28,8 @@ declare global {
     interface Request {
       auth: IJwtUser,
       user: User,
-      tenantParticipant: TenantParticipant | null,
+      tenant: TenantControllerSet,
+      tenantParticipant: TenantParticipant,
     }
   }
 }

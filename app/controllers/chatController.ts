@@ -1,15 +1,15 @@
 import { TenantModel } from './AbstractTenantModel';
-import { TenantChat, TenantTableName } from '../types';
+import { TenantChat, TenantTableName, Tenant } from '../types';
 
 class ChatController extends TenantModel<TenantChat> {
 
   tenantTableName: TenantTableName;
 
-  constructor() {
-    super();
+  constructor(tenant: Tenant) {
+    super(tenant);
     this.tenantTableName = 'tenant_chats_table';
   }
 
 }
 
-export default new ChatController();
+export default ChatController;

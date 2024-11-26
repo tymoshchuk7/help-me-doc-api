@@ -1,15 +1,15 @@
 import { TenantModel } from './AbstractTenantModel';
-import { TenantMessage, TenantTableName } from '../types';
+import { Tenant, TenantMessage, TenantTableName } from '../types';
 
 class MessageController extends TenantModel<TenantMessage> {
 
   tenantTableName: TenantTableName;
 
-  constructor() {
-    super();
+  constructor(tenant: Tenant) {
+    super(tenant);
     this.tenantTableName = 'tenant_messages_table';
   }
 
 }
 
-export default new MessageController();
+export default MessageController;

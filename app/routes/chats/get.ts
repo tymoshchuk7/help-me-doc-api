@@ -1,21 +1,17 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
-import { TenantController, ChatController } from '../../controllers';
 import { TenantChat, GlobalTableNames } from '../../types';
 
 export default asyncRoute(async (req: Request, res: Response) => {
-  const { user, tenantParticipant } = req;
+  const { tenantParticipant, tenant } = req;
 
   if (!tenantParticipant) {
     throw new Error('Tenant participant is missing');
   }
 
-  const tenant = await TenantController.findOneById(user.default_tenant);
-  if (!tenant) {
-    throw new Error('Tenant is missing');
-  }
+  const { ChatController } = tenant;
 
-  const chatQueryObject = ChatController.query(tenant);
+  const chatQueryObject = ChatController.query();
   const chats: TenantChat = await chatQueryObject
     .join(`${tenant.tenant_chats_members_table} as tcm1`, `${tenant.tenant_chats_table}.id`, 'tcm1.chat_id')
     .join(`${tenant.tenant_chats_members_table} as tcm2`, `${tenant.tenant_chats_table}.id`, 'tcm2.chat_id')

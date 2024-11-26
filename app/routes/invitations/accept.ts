@@ -1,12 +1,12 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
 import {
-  InvitationController, ParticipantController, UserController,
+  InvitationController, UserController,
 } from '../../controllers';
 
 export default asyncRoute(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { user } = req;
+  const { user, tenant } = req;
 
   const invitation = await InvitationController.findOneById(id);
 
@@ -14,12 +14,11 @@ export default asyncRoute(async (req: Request, res: Response) => {
     throw new Error('Invitation is missing');
   }
 
-  const dto = {
+  const { ParticipantController } = tenant;
+  await ParticipantController.create({
     role: invitation.role,
     user_id: user.id,
-  };
-
-  await ParticipantController.create(invitation.tenant, dto);
+  });
   await UserController.update({ id: user.id }, { default_tenant: invitation.tenant });
 
   return res.sendStatus(200);

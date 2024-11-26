@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ParticipantController } from '../controllers';
+import { TenantController } from '../controllers';
 import { ApiError } from '../utils';
 import { ROLE_PERMISSIONS } from '../constants';
 import { AccessError, Permissions } from '../types';
@@ -15,7 +15,14 @@ export default function checkParticipantPermissions(permissions: Permissions[]) 
         return next(new ApiError({ message: 'User is missing.', statusCode: 404 }));
       }
 
-      const participant = await ParticipantController.findOne(req.user.default_tenant, { user_id: req.user.id });
+      const tenant = await TenantController.findOneById(req.user.default_tenant);
+      if (!tenant) {
+        return next(new ApiError({ message: 'Tenant is missing.', statusCode: 404 }));
+      }
+      req.tenant = tenant;
+
+      const { ParticipantController } = tenant;
+      const participant = await ParticipantController.findOne({ user_id: req.user.id });
       if (!participant) {
         return next(new ApiError({ message: 'Participant is missing.', statusCode: 404 }));
       }

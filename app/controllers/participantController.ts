@@ -1,15 +1,15 @@
 import { TenantModel } from './AbstractTenantModel';
-import { TenantParticipant, TenantTableName } from '../types';
+import { Tenant, TenantParticipant, TenantTableName } from '../types';
 
 class ParticipantController extends TenantModel<TenantParticipant> {
 
   tenantTableName: TenantTableName;
 
-  constructor() {
-    super();
+  constructor(tenant: Tenant) {
+    super(tenant);
     this.tenantTableName = 'tenant_participants_table';
   }
 
 }
 
-export default new ParticipantController();
+export default ParticipantController;

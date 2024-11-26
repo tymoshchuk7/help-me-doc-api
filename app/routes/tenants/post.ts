@@ -1,7 +1,6 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
-import { createTenant } from '../../database';
-import { UserController, ParticipantController } from '../../controllers';
+import { UserController, TenantController } from '../../controllers';
 
 interface Body {
   data: { name: string },
@@ -15,9 +14,14 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     throw new Error('User already has related tenant');
   }
 
-  const tenant = await createTenant(user.id, name);
+  const tenant = await TenantController.create({ name, user_id: user.id });
+  if (!tenant) {
+    throw new Error('Tenant has not been created');
+  }
+
+  const { ParticipantController } = tenant;
   await UserController.update({ id: user.id }, { default_tenant: tenant.id });
-  await ParticipantController.create(tenant.id, { role: 'chief', user_id: user.id });
+  await ParticipantController.create({ role: 'chief', user_id: user.id });
 
   const updatedUser = await UserController.findUserJoiningParticipant(user.id);
 

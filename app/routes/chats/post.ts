@@ -1,9 +1,5 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
-import {
-  ChatController, ChatMemberController, ParticipantController,
-  ChatMessageController, TenantController,
-} from '../../controllers';
 import { TenantChat } from '../../types';
 
 interface Body {
@@ -14,18 +10,22 @@ interface Body {
 }
 
 export default asyncRoute(async (req: Request<object, object, Body>, res: Response) => {
-  const { user, tenantParticipant } = req;
+  const { tenantParticipant, tenant } = req;
   const { data: { participantRecipientId, content } } = req.body;
 
   if (!tenantParticipant) {
     throw new Error('Tenant participant is missing');
   }
 
-  const tenant = await TenantController.findOneById(user.default_tenant);
+  const {
+    ChatController, ChatMessageController, ParticipantController,
+    ChatMemberController,
+  } = tenant;
+
   if (!tenant) {
     throw new Error('Tenant is missing');
   }
-  const chatQueryObject = ChatController.query(tenant);
+  const chatQueryObject = ChatController.query();
 
   const createdChatBefore: TenantChat = await chatQueryObject
     .join(`${tenant.tenant_chats_members_table} as tcm1`, `${tenant.tenant_chats_table}.id`, 'tcm1.chat_id')
@@ -36,29 +36,29 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     .select(`${tenant.tenant_chats_table}.id`)
     .first();
 
-  const chat = createdChatBefore || (await ChatController.create(user.default_tenant, {}));
+  const chat = createdChatBefore || (await ChatController.create({}));
 
   if (!chat) {
     throw new Error('Tenant chat is missing');
   }
 
-  const senderChatMember = await ChatMemberController.create(user.default_tenant, {
+  const senderChatMember = await ChatMemberController.create({
     participant_id: tenantParticipant.id,
     chat_id: chat.id,
   });
 
-  const participantRecipient = await ParticipantController.findOneById(user.default_tenant, participantRecipientId);
+  const participantRecipient = await ParticipantController.findOneById(participantRecipientId);
 
   if (!participantRecipient) {
     throw new Error('Tenant recipient is missing');
   }
 
-  await ChatMemberController.create(user.default_tenant, {
+  await ChatMemberController.create({
     participant_id: participantRecipient.id,
     chat_id: chat.id,
   });
 
-  await ChatMessageController.create(user.default_tenant, {
+  await ChatMessageController.create({
     chat_id: chat.id,
     chat_member_id: senderChatMember?.id,
     content,

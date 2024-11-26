@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Knex } from 'knex';
-import { User, GlobalTableNames, Tenant } from '../app/types';
-import { CreateTenantTables } from '../app/database';
-import { getTenantTablesNames } from '../app/helpers';
+import { User, GlobalTableNames } from '../app/types';
+import { TenantController } from '../app/controllers';
 
 //TODO remove hardcoded tenant id
 const hardcodedTenantId = '9866b10b-5833-4cb2-a117-289503870860';
@@ -12,10 +11,13 @@ interface ParticipantsDTO {
   role: string,
 }
 
-class CreateInitialData extends CreateTenantTables {
+class CreateInitialData {
+
+  database: Knex<any, unknown[]>;
+
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
   constructor(database: Knex<any, unknown[]>) {
-    super(database);
+    this.database = database;
   }
 
   async createInitialTenant() {
@@ -40,48 +42,27 @@ class CreateInitialData extends CreateTenantTables {
           default_tenant: hardcodedTenantId,
         }).returning('id').transacting(ctx);
 
-        const tenantName = `tenant-${ownerUserId}`;
-        const tableNames = getTenantTablesNames(ownerUserId);
+        const tenant = await TenantController.seedTenantTable({
+          id: hardcodedTenantId,
+          user_id: ownerUserId,
+          name: 'Test',
+        }, ctx);
 
-        const [tenant]: Tenant[] = await this.database(GlobalTableNames.tenants)
-          .insert({
-            id: hardcodedTenantId,
-            user_id: ownerUserId,
-            name: 'Test',
-            tenant_name: tenantName,
-            tenant_participants_table: tableNames.participants_table,
-            tenant_chats_table: tableNames.chats_table,
-            tenant_messages_table: tableNames.messages_table,
-            tenant_chats_members_table: tableNames.chat_members_table,
-            tenant_media_table: tableNames.media_table,
-          })
-          .returning([
-            'id',
-            'tenant_participants_table',
-            'tenant_chats_table',
-            'tenant_messages_table',
-            'tenant_chats_members_table',
-            'tenant_media_table',
-          ])
-          .transacting(ctx);
-
-        await this.createTenantParticipantsTable(tenant, ctx);
+        if (!tenant) {
+          throw new Error('Tenant has not been created');
+        }
 
         const createdUsers = await this.createInitialUsers(ctx);
-        const participantsDTO = (createdUsers as User[]).map(
-          (createdUser) => ({ userId: createdUser.id, role: 'patient' }),
-        );
+        const participantsDTO = (createdUsers as User[]).map((createdUser) => ({
+          userId: createdUser.id,
+          role: 'patient',
+        }));
         participantsDTO.push(
           { role: 'chief', userId: ownerUserId },
           { role: 'admin', userId: adminUserId },
           { role: 'doctor', userId: docUserId },
         );
         await this.createInitialParticipants(tenant.tenant_participants_table, participantsDTO, ctx);
-
-        await this.createTenantChatsTable(tenant, ctx);
-        await this.createTenantChatMembersTable(tenant, ctx);
-        await this.createTenantMessagesTable(tenant, ctx);
-        await this.createTenantMediaTable(tenant, ctx);
 
         await ctx.commit();
       } catch (e) {
@@ -91,7 +72,7 @@ class CreateInitialData extends CreateTenantTables {
     });
   }
 
-  private async createInitialUsers(ctx: any) {
+  private async createInitialUsers(ctx: Knex.Transaction) {
     return this.database(GlobalTableNames.users).insert([{
       email: 'testclient@gmail.com',
       first_name: 'test',
@@ -111,7 +92,11 @@ class CreateInitialData extends CreateTenantTables {
     }]).returning('id').transacting(ctx);
   }
 
-  private async createInitialParticipants(participantsTable: string, participantsDTO: ParticipantsDTO[], ctx: any) {
+  private async createInitialParticipants(
+    participantsTable: string,
+    participantsDTO: ParticipantsDTO[],
+    ctx: Knex.Transaction,
+  ) {
     for (const { role, userId } of participantsDTO) {
       await this.database(participantsTable).insert({
         role, user_id: userId,
