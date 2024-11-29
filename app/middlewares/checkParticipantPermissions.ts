@@ -4,13 +4,11 @@ import { ApiError } from '../utils';
 import { ROLE_PERMISSIONS } from '../constants';
 import { AccessError, Permissions } from '../types';
 
-export default function checkParticipantPermissions(permissions: Permissions[]) {
+type CheckPermissionsCallback = (req: Request) => Promise<boolean> | boolean;
+
+export default function checkParticipantPermissions(permissions: Permissions[] | CheckPermissionsCallback) {
   return async function (req: Request, res: Response, next: NextFunction) {
     try {
-      if (permissions.length === 0) {
-        return next();
-      }
-
       if (!req.user) {
         return next(new ApiError({ message: 'User is missing.', statusCode: 404 }));
       }
@@ -28,12 +26,25 @@ export default function checkParticipantPermissions(permissions: Permissions[]) 
       }
       req.tenantParticipant = participant;
 
-      const hasPermissions = permissions.every((permission) => ROLE_PERMISSIONS[participant.role].has(permission));
-      if (!hasPermissions) {
-        return next(new ApiError({
-          message: 'Access denied. You do not have the required permissions.',
-          statusCode: 403,
-        }));
+      if (Array.isArray(permissions)) {
+        if (permissions.length === 0) {
+          return next();
+        }
+
+        const hasPermissions = permissions.every((permission) => ROLE_PERMISSIONS[participant.role].has(permission));
+        if (!hasPermissions) {
+          return next(new ApiError({
+            message: 'Access denied. You do not have the required permissions.',
+            statusCode: 403,
+          }));
+        }
+      } else {
+        if (!(await permissions(req))) {
+          return next(new ApiError({
+            message: 'Access denied. You do not have the required permissions.',
+            statusCode: 403,
+          }));
+        }
       }
 
       next();

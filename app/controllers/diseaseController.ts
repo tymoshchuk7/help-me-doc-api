@@ -1,18 +1,16 @@
-import { Model } from './AbstractModel';
-import { Disease, GlobalTableNames } from '../types';
+import { TenantModel } from './AbstractTenantModel';
+import { TenantDisease, TenantTableName, Tenant } from '../types';
 
-class DiseaseController extends Model<Disease> {
+class DiseaseController extends TenantModel<TenantDisease> {
 
-  tableName: GlobalTableNames;
+  tenantTableName: TenantTableName;
 
-  columns: string[];
 
-  constructor() {
-    super();
-    this.tableName = GlobalTableNames.diseases;
-    this.columns = ['id', 'user_id', 'name', 'status', 'description', 'treatment'];
+  constructor(tenant: Tenant) {
+    super(tenant);
+    this.tenantTableName = 'tenant_diseases_table';
   }
 
 }
 
-export default new DiseaseController();
+export default DiseaseController;
