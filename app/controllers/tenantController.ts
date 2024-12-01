@@ -7,12 +7,14 @@ import ParticipantController from './participantController';
 import ChatController from './chatController';
 import ChatMemberController from './chatMemberController';
 import MessageController from './messageController';
+import DiseaseController from './diseaseController';
 
 export type TenantControllerSet = Tenant & {
   ParticipantController: ParticipantController,
   ChatController: ChatController,
   ChatMemberController: ChatMemberController,
   ChatMessageController: MessageController
+  DiseaseController: DiseaseController,
 };
 
 const serializeValue = (tenant: Tenant): TenantControllerSet => ({
@@ -21,6 +23,7 @@ const serializeValue = (tenant: Tenant): TenantControllerSet => ({
   ChatController: new ChatController(tenant),
   ChatMemberController: new ChatMemberController(tenant),
   ChatMessageController: new MessageController(tenant),
+  DiseaseController: new DiseaseController(tenant),
 });
 
 export function createTenantParticipantsTable(tenant: Tenant, ctx: Knex.Transaction) {
@@ -69,6 +72,19 @@ export function createTenantChatMembersTable(tenant: Tenant, ctx: Knex.Transacti
   }).transacting(ctx);
 }
 
+export function createTenantDiseasesTable(tenant: Tenant, ctx: Knex.Transaction) {
+  return db.schema.createTable(tenant.tenant_diseases_table, (table) => {
+    table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
+    table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`);
+    table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`);
+    table.string('name').notNullable();
+    table.enu('status', ['active', 'resolved', 'chronic']).notNullable();
+    table.text('description');
+    table.text('treatment');
+
+  }).transacting(ctx);
+}
+
 class TenantController {
 
   columns: string[];
@@ -103,11 +119,13 @@ class TenantController {
             tenant_messages_table: tableNames.messages_table,
             tenant_chats_members_table: tableNames.chat_members_table,
             tenant_media_table: tableNames.media_table,
+            tenant_diseases_table: tableNames.diseases_table,
           })
           .returning('*')
           .transacting(ctx);
 
         await createTenantParticipantsTable(tenant, ctx);
+        await createTenantDiseasesTable(tenant, ctx);
         await createTenantChatsTable(tenant, ctx);
         await createTenantChatMembersTable(tenant, ctx);
         await createTenantMessagesTable(tenant, ctx);
@@ -145,11 +163,13 @@ class TenantController {
         tenant_messages_table: tableNames.messages_table,
         tenant_chats_members_table: tableNames.chat_members_table,
         tenant_media_table: tableNames.media_table,
+        tenant_diseases_table: tableNames.diseases_table,
       })
       .returning('*')
       .transacting(ctx);
 
     await createTenantParticipantsTable(tenant, ctx);
+    await createTenantDiseasesTable(tenant, ctx);
     await createTenantChatsTable(tenant, ctx);
     await createTenantChatMembersTable(tenant, ctx);
     await createTenantMessagesTable(tenant, ctx);
