@@ -7,8 +7,15 @@ import { ROLE_PERMISSIONS } from '../../constants';
 import { Permissions } from '../../types';
 
 import post from './post';
+import put from './put';
 import get from './get';
 import retrieve from './retrieve';
+
+const patientRequiredValidation: Schema = {
+  'data.patient_participant_id': {
+    notEmpty: true,
+  },
+};
 
 const diseaseValidationSchema: Schema = {
   'data.name': {
@@ -25,9 +32,6 @@ const diseaseValidationSchema: Schema = {
   'data.status': {
     notEmpty: true,
     isIn: { options: [['active', 'resolved', 'chronic']] },
-  },
-  'data.patient_participant_id': {
-    notEmpty: true,
   },
   'data.treatment': {
     isLength: {
@@ -54,13 +58,35 @@ async function canSeeDisease(req: Request) {
   return ROLE_PERMISSIONS[tenantParticipant.role].has(Permissions.CAN_VIEW_DISEASES);
 }
 
+async function canUpdateDisease(req: Request) {
+  const { tenant, tenantParticipant } = req;
+  if (!tenant) {
+    throw new Error('Tenant is missing');
+  }
+
+  const { DiseaseController } = tenant;
+  const disease = await DiseaseController.findOneById(req.params.id);
+  if (!disease) {
+    throw new Error('Disease is missing');
+  }
+
+  return disease.doctor_participant_id === tenantParticipant.id;
+}
+
 export default Router()
   .post(
     '/',
     authenticateUser(),
     checkParticipantPermissions([Permissions.CAN_CREATE_DISEASES]),
-    ...validate(diseaseValidationSchema),
+    ...validate({ ...diseaseValidationSchema, ...patientRequiredValidation }),
     (req: Request, res: Response) => void post(req, res),
+  )
+  .put(
+    '/:id',
+    authenticateUser(),
+    checkParticipantPermissions(canUpdateDisease),
+    ...validate(diseaseValidationSchema),
+    (req: Request, res: Response) => void put(req, res),
   )
   .get(
     '/:id',
