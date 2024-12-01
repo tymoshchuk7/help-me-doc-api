@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { Schema } from 'express-validator';
 import {
-  authenticateUser, checkParticipantPermissions, validate,
+  authenticateUser, loadTenant, validate,
 } from '../../middlewares';
 import { Permissions } from '../../types';
 
@@ -28,25 +28,25 @@ export default Router()
   .get(
     '/contacts',
     authenticateUser(),
-    checkParticipantPermissions([Permissions.CAN_SEND_MESSAGES]),
+    loadTenant([Permissions.CAN_SEND_MESSAGES]),
     (req: Request, res: Response) => void getAvailableContacts(req, res),
   )
   .post(
     '/',
     authenticateUser(),
-    checkParticipantPermissions([Permissions.CAN_SEND_MESSAGES]),
+    loadTenant([Permissions.CAN_SEND_MESSAGES]),
     ...validate(messageValidationSchema),
     (req: Request, res: Response) => void post(req, res),
   )
   .get(
     '/',
     authenticateUser(),
-    checkParticipantPermissions([Permissions.CAN_SEND_MESSAGES]),
+    loadTenant([Permissions.CAN_SEND_MESSAGES]),
     (req: Request, res: Response) => void get(req, res),
   )
   .get(
     '/:id',
     authenticateUser(),
-    checkParticipantPermissions([Permissions.CAN_SEND_MESSAGES]),
+    loadTenant([Permissions.CAN_SEND_MESSAGES]),
     (req: Request, res: Response) => void retrieve(req, res),
   );

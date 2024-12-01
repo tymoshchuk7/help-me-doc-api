@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { Schema } from 'express-validator';
 import {
-  authenticateUser, checkParticipantPermissions, validate,
+  authenticateUser, loadTenant, validate,
 } from '../../middlewares';
 import { ROLE_PERMISSIONS } from '../../constants';
 import { Permissions } from '../../types';
@@ -77,26 +77,26 @@ export default Router()
   .post(
     '/',
     authenticateUser(),
-    checkParticipantPermissions([Permissions.CAN_CREATE_DISEASES]),
+    loadTenant([Permissions.CAN_CREATE_DISEASES]),
     ...validate({ ...diseaseValidationSchema, ...patientRequiredValidation }),
     (req: Request, res: Response) => void post(req, res),
   )
   .put(
     '/:id',
     authenticateUser(),
-    checkParticipantPermissions(canUpdateDisease),
+    loadTenant(canUpdateDisease),
     ...validate(diseaseValidationSchema),
     (req: Request, res: Response) => void put(req, res),
   )
   .get(
     '/:id',
     authenticateUser(),
-    checkParticipantPermissions(canSeeDisease),
+    loadTenant(canSeeDisease),
     (req: Request, res: Response) => void retrieve(req, res),
   )
   .get(
     '/',
     authenticateUser(),
-    checkParticipantPermissions([Permissions.CAN_VIEW_DISEASES]),
+    loadTenant([Permissions.CAN_VIEW_DISEASES]),
     (req: Request, res: Response) => void get(req, res),
   );

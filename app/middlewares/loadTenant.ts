@@ -6,7 +6,7 @@ import { AccessError, Permissions } from '../types';
 
 type CheckPermissionsCallback = (req: Request) => Promise<boolean> | boolean;
 
-export default function checkParticipantPermissions(permissions: Permissions[] | CheckPermissionsCallback) {
+export default function loadTenant(permissions: Permissions[] | CheckPermissionsCallback) {
   return async function (req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.user) {
