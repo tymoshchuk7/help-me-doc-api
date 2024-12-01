@@ -78,7 +78,7 @@ export function createTenantDiseasesTable(tenant: Tenant, ctx: Knex.Transaction)
     table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`);
     table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`);
     table.string('name').notNullable();
-    table.string('status').notNullable();
+    table.enu('status', ['active', 'resolved', 'chronic']).notNullable();
     table.text('description');
     table.text('treatment');
 

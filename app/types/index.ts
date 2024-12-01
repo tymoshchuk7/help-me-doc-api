@@ -70,7 +70,7 @@ export interface TenantDisease {
   doctor_participant_id: string,
   patient_participant_id: string,
   name: string,
-  status: string,
+  status: 'active' | 'resolved' | 'chronic',
   description: string,
   treatment: string,
 }
