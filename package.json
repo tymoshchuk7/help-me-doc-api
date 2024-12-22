@@ -8,6 +8,7 @@
     "db:migrate-rollback": "NODE_ENV=development knex migrate:rollback",
     "db:seed": "NODE_ENV=development knex seed:run",
     "start": "NODE_ENV=development npx ts-node-dev --unhandled-rejections=strict -r dotenv/config --files .",
+    "dev": "npm run db:migrate && npm run db:seed && npm run start",
     "lint": "eslint --ext .ts,.tsx ./",
     "lint-fix": "npm run lint-pure -- --fix",
     "check-types": "tsc --noEmit",

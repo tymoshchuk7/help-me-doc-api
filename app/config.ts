@@ -11,9 +11,5 @@ export const config = {
   redisUrl: process.env.REDIS_URL,
   apiThrottleRate: process.env.API_THROTTLE_RATE,
   appPort: process.env.PORT || 8000,
-  dbHost: process.env.DB_HOST,
-  dbPort: Number(process.env.DB_PORT),
-  dbName: process.env.DB_NAME,
-  dbUser: process.env.DB_USER,
-  dbPassword: process.env.DB_PASSWORD,
+  databaseConnectionUrl: process.env.DB_URL,
 };

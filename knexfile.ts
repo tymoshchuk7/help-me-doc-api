@@ -4,13 +4,7 @@ import { config } from './app/config';
 const knexConfig: { [key: string]: Knex.Config } = {
   development: {
     client: 'pg',
-    connection: {
-      host: config.dbHost,
-      port: config.dbPort,
-      database: config.dbName,
-      user: config.dbUser,
-      password: config.dbPassword,
-    },
+    connection: config.databaseConnectionUrl,
     seeds: {
       directory: './seeds',
     },

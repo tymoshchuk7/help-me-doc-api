@@ -5,11 +5,8 @@ This project is a Node.js server using Express.js, PostgreSQL and Redis, with au
 ## Development
 
 For development, run the following:
-1. Install dependencies `npm run install`
-2. Set up PostgreSQL and create `help-me-doc` database. Also, install create extension "uuid-ossp" for the database  
-3. Set up Auth0 (Create app and generate credentials)
-4. Set up Sendgrid for sending email (Create app and generate credentials)
-5. Create and set up .env file according to `.example.env` file
-6. Run database migrations `npm run db:migrate`
-7. Seed the database `npm run db:seed`
-8. Run server `npm run start`
+1. Set up Auth0 (Create app and generate credentials)
+2. Set up Sendgrid for sending email (Create app and generate credentials)
+3. Create and set up .env file according to `.example.env` file
+4. Set DB_PASSWORD env variable, e.g. `export DB_PASSWORD=some_password` 
+5. Run docker-compose `podman-compose -f docker-compose.local.yml up` 
