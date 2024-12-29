@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import { Schema } from 'express-validator';
 import {
   authenticateUser, loadTenant, validate,
+  validateParams,
 } from '../../middlewares';
 import { Permissions } from '../../types';
 
@@ -48,5 +49,6 @@ export default Router()
     '/:id',
     authenticateUser(),
     loadTenant([Permissions.CAN_SEND_MESSAGES]),
+    ...validateParams(),
     (req: Request, res: Response) => void retrieve(req, res),
   );

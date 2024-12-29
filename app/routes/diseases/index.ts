@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import { Schema } from 'express-validator';
 import {
   authenticateUser, loadTenant, validate,
+  validateParams,
 } from '../../middlewares';
 import { ROLE_PERMISSIONS } from '../../constants';
 import { Permissions } from '../../types';
@@ -85,6 +86,7 @@ export default Router()
     '/:id',
     authenticateUser(),
     loadTenant(canUpdateDisease),
+    ...validateParams(),
     ...validate(diseaseValidationSchema),
     (req: Request, res: Response) => void put(req, res),
   )
@@ -92,6 +94,7 @@ export default Router()
     '/:id',
     authenticateUser(),
     loadTenant(canSeeDisease),
+    ...validateParams(),
     (req: Request, res: Response) => void retrieve(req, res),
   )
   .get(
