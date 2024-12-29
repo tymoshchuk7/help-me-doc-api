@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import misc from './misc';
 import users from './users';
 import tenants from './tenants';
 import invitations from './invitations';
@@ -8,6 +9,7 @@ import participants from './participants';
 
 export default Router()
   .get('/', (req, res) => res.sendStatus(200))
+  .use('/', misc)
   .use('/users', users)
   .use('/tenants', tenants)
   .use('/invitations', invitations)
