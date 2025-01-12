@@ -49,11 +49,10 @@ export default asyncRoute(async (req: Request, res: Response) => {
       `${tenant.tenant_messages_table}.chat_id`,
       `${tenant.tenant_messages_table}.chat_member_id`,
       `${tenant.tenant_messages_table}.content`,
-      `${tenant.tenant_messages_table}.sent_timestamp`,
       'tp.id as participant_id',
       'user.id as user_id',
     )
-    .orderBy(`${tenant.tenant_messages_table}.sent_timestamp`, 'asc');
+    .orderBy(`${tenant.tenant_messages_table}.created_at`, 'asc');
 
   return res.json({ chat, messages });
 });

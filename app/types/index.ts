@@ -97,6 +97,7 @@ export interface TenantChatMember {
   id: string,
   participant_id: string,
   chat_id: string,
+  last_read_message_id: string | null,
 }
 
 export interface TenantMessage {
@@ -104,7 +105,6 @@ export interface TenantMessage {
   chat_member_id: string,
   chat_id: string,
   content: string,
-  sent_timestamp: string,
 }
 
 export interface TenantMedia {

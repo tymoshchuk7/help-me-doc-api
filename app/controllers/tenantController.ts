@@ -32,6 +32,7 @@ export function createTenantParticipantsTable(tenant: Tenant, ctx: Knex.Transact
     table.uuid('user_id').references('users.id').onDelete('CASCADE').notNullable();
     table.string('status');
     table.string('role').notNullable();
+    table.timestamps(true, true);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   }).transacting(ctx);
 }
@@ -39,6 +40,7 @@ export function createTenantParticipantsTable(tenant: Tenant, ctx: Knex.Transact
 export function createTenantChatsTable(tenant: Tenant, ctx: Knex.Transaction) {
   return db.schema.createTable(tenant.tenant_chats_table, (table) => {
     table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
+    table.timestamps(true, true);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   }).transacting(ctx);
 }
@@ -49,7 +51,8 @@ export function createTenantMessagesTable(tenant: Tenant, ctx: Knex.Transaction)
     table.uuid('chat_id').references(`${tenant.tenant_chats_table}.id`).onDelete('CASCADE').notNullable();
     table.uuid('chat_member_id').references(`${tenant.tenant_chats_members_table}.id`).onDelete('CASCADE').notNullable();
     table.text('content').notNullable();
-    table.date('sent_timestamp').notNullable();
+    table.boolean('is_read').defaultTo(false);
+    table.timestamps(true, true);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   }).transacting(ctx);
 }
@@ -59,6 +62,7 @@ export function createTenantMediaTable(tenant: Tenant, ctx: Knex.Transaction) {
     table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
     table.string('bucket_path').notNullable();
     table.uuid('message_id').references(`${tenant.tenant_messages_table}.id`).onDelete('CASCADE').notNullable();
+    table.timestamps(true, true);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   }).transacting(ctx);
 }
@@ -68,6 +72,8 @@ export function createTenantChatMembersTable(tenant: Tenant, ctx: Knex.Transacti
     table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
     table.uuid('participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
     table.uuid('chat_id').references(`${tenant.tenant_chats_table}.id`).onDelete('CASCADE').notNullable();
+    table.string('last_read_message_id');
+    table.timestamps(true, true);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   }).transacting(ctx);
 }
@@ -81,7 +87,7 @@ export function createTenantDiseasesTable(tenant: Tenant, ctx: Knex.Transaction)
     table.enu('status', ['active', 'resolved', 'chronic']).notNullable();
     table.text('description');
     table.text('treatment');
-
+    table.timestamps(true, true);
   }).transacting(ctx);
 }
 
