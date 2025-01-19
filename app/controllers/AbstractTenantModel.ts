@@ -13,7 +13,7 @@ export abstract class TenantModel<T extends ModelMeta> {
     this.tenant = tenant;
   }
 
-  async create(value: Partial<T>): Promise<T | undefined> {
+  async create(value: Partial<T>): Promise<T> {
     const tableName = this.tenant[this.tenantTableName];
     //TODO test and refactor later
     //@ts-ignore

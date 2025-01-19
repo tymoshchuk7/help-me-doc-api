@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
+import { sendNewMessageNotification } from '../../socketIOServer';
 import { TenantChat } from '../../types';
 
 interface Body {
@@ -10,7 +11,7 @@ interface Body {
 }
 
 export default asyncRoute(async (req: Request<object, object, Body>, res: Response) => {
-  const { tenantParticipant, tenant } = req;
+  const { tenantParticipant, tenant, user } = req;
   const { data: { participantRecipientId, content } } = req.body;
 
   if (!tenantParticipant) {
@@ -42,10 +43,17 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     throw new Error('Tenant chat is missing');
   }
 
-  const senderChatMember = await ChatMemberController.create({
+  const senderChatMember = await (createdChatBefore ? ChatMemberController.findOne({
     participant_id: tenantParticipant.id,
     chat_id: chat.id,
-  });
+  }) : ChatMemberController.create({
+    participant_id: tenantParticipant.id,
+    chat_id: chat.id,
+  }));
+
+  if (!senderChatMember) {
+    throw new Error('Tenant sender chat participant is missing');
+  }
 
   const participantRecipient = await ParticipantController.findOneById(participantRecipientId);
 
@@ -53,15 +61,24 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     throw new Error('Tenant recipient is missing');
   }
 
-  await ChatMemberController.create({
-    participant_id: participantRecipient.id,
-    chat_id: chat.id,
-  });
+  if (!createdChatBefore) {
+    await ChatMemberController.create({
+      participant_id: participantRecipient.id,
+      chat_id: chat.id,
+    });
+  }
 
-  await ChatMessageController.create({
+  const message = await ChatMessageController.create({
     chat_id: chat.id,
     chat_member_id: senderChatMember?.id,
     content,
+  });
+
+  sendNewMessageNotification({
+    recipientParticipantId: participantRecipient.id,
+    userSender: user,
+    messageId: message.id,
+    chatId: chat.id,
   });
 
   return res.json({ chat });

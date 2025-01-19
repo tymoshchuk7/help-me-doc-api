@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Application } from 'express';
 import jwks from 'jwks-rsa';
 import jwt, { JwtPayload } from 'jsonwebtoken';
@@ -5,6 +6,7 @@ import { Server, Socket, ExtendedError } from 'socket.io';
 import { createServer } from 'http';
 import { config } from './config';
 import { UserController, TenantController } from './controllers';
+import { TenantChatMember, User } from './types';
 
 interface Handshake {
   token: string,
@@ -16,6 +18,19 @@ interface ChatMessagePayload {
   chatId: string,
   participantId: string,
   content: string,
+}
+
+interface INotification {
+  roomName: string,
+  event: string,
+  payload: any,
+}
+
+interface INewMessageNotification {
+  recipientParticipantId: string,
+  userSender: User,
+  messageId: string,
+  chatId: string,
 }
 
 const socketIO = new Server();
@@ -31,6 +46,7 @@ export function initializeSocketIO(app: Application) {
 }
 
 const getChatRoomName = (chatId: string) => `chat-room-${chatId}`;
+const getMainRoomName = (participantId: string) => `participant-room-${participantId}`;
 
 function getKey(header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) {
   const client = jwks({
@@ -64,6 +80,33 @@ const authenticateSocket = (socket: Socket, next: (err?: ExtendedError) => void)
   });
 };
 
+const broadcastNotification = ({ roomName, event, payload }: INotification) =>
+  socketIO.to(roomName).emit(event, JSON.stringify(payload));
+
+const broadcastChatMessage = (chatId: string, message: object) => broadcastNotification({
+  roomName: getChatRoomName(chatId),
+  event: 'RECEIVE_MESSAGE',
+  payload: message,
+});
+
+export const sendNewMessageNotification = ({
+  recipientParticipantId, messageId, userSender, chatId,
+}: INewMessageNotification) => broadcastNotification({
+  roomName: getMainRoomName(recipientParticipantId),
+  event: 'NOTIFICATION',
+  payload: {
+    type: 'MESSAGE_NOTIFICATION',
+    title: `${userSender.first_name} ${userSender.last_name} sent you a message`,
+    description: '',
+    attributes: { messageId, chatId },
+  },
+});
+
+/*
+* WARNING: It will not work for multiple instances,
+* as users can be connected to different app instances.
+*/
+
 socketIO
   .use(authenticateSocket)
   .on('connection', async (socket) => {
@@ -78,7 +121,7 @@ socketIO
         return socket.disconnect();
       }
 
-      const participantMainRoom = `participant-room-${participantId}`;
+      const participantMainRoom = getMainRoomName(participantId);
       await socket.join(participantMainRoom);
 
       socket.on('ENTER_CHAT_ROOM', (chatId: string) => socket.join(getChatRoomName(chatId)));
@@ -87,20 +130,34 @@ socketIO
       socket.on('CHAT_MESSAGE', async (data) => {
         const { chatId, participantId: senderParticipantId, content }: ChatMessagePayload = JSON.parse(data as string);
         const { ChatMessageController, ChatMemberController } = tenant;
-        const chatMemember = await ChatMemberController.findOne({
+        const chatMember = await ChatMemberController.findOne({
           chat_id: chatId,
           participant_id: senderParticipantId,
         });
-        if (!chatMemember) {
+        if (!chatMember) {
           return socket.disconnect();
         }
         const message = await ChatMessageController.create({
           chat_id: chatId,
-          chat_member_id: chatMemember.id,
+          chat_member_id: chatMember.id,
           content,
-          sent_timestamp: new Date().toISOString(),
         });
-        socketIO.to(getChatRoomName(chatId)).emit('RECEIVE_MESSAGE', JSON.stringify(message));
+        broadcastChatMessage(chatId, message);
+
+        const queryObject = ChatMemberController.query();
+        const chatMemberRecipient: TenantChatMember = await queryObject
+          .where({ chat_id: chatId })
+          .whereNot('participant_id', senderParticipantId)
+          .first();
+
+        if (chatMemberRecipient) {
+          sendNewMessageNotification({
+            recipientParticipantId: chatMemberRecipient.participant_id,
+            userSender: user,
+            messageId: message.id,
+            chatId: chatId,
+          });
+        }
       });
     } catch {}
   });
