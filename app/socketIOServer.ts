@@ -88,6 +88,12 @@ const broadcastChatMessage = (chatId: string, message: object) => broadcastNotif
   event: 'RECEIVE_MESSAGE',
   payload: message,
 });
+// socketIO.to(participantMainRoom).emit('READY')
+const broadcastSocketReady = (roomName: string) => broadcastNotification({
+  roomName,
+  event: 'READY',
+  payload: {},
+});
 
 export const sendNewMessageNotification = ({
   recipientParticipantId, messageId, userSender, chatId,
@@ -159,5 +165,7 @@ socketIO
           });
         }
       });
+
+      broadcastSocketReady(participantMainRoom);
     } catch {}
   });
