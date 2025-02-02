@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
+import { ApiException } from '../../exceptions';
 import { UserController, TenantController } from '../../controllers';
 
 interface Body {
@@ -11,12 +12,12 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
   const { data: { name } } = req.body;
 
   if (user.default_tenant) {
-    throw new Error('User already has related tenant');
+    throw new ApiException({ message: 'User already has related tenant' });
   }
 
   const tenant = await TenantController.create({ name, user_id: user.id });
   if (!tenant) {
-    throw new Error('Tenant has not been created');
+    throw new ApiException({ message: 'Tenant has not been created' });
   }
 
   const { ParticipantController } = tenant;

@@ -1,8 +1,7 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
-import {
-  InvitationController, UserController,
-} from '../../controllers';
+import { NotFoundException } from '../../exceptions';
+import { InvitationController, UserController } from '../../controllers';
 
 export default asyncRoute(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -11,7 +10,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
   const invitation = await InvitationController.findOneById(id);
 
   if (!invitation) {
-    throw new Error('Invitation is missing');
+    throw new NotFoundException({ message: 'Invitation is missing' });
   }
 
   const { ParticipantController } = tenant;

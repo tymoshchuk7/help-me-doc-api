@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
+import { NotFoundException } from '../../exceptions';
 
 export default asyncRoute(async (req: Request, res: Response) => {
   const { tenant } = req;
@@ -7,7 +8,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
 
   const disease = await DiseaseController.findOneById(req.params.id);
   if (!disease) {
-    throw new Error('Disease is missing');
+    throw new NotFoundException({ message: 'Disease is missing' });
   }
 
   return res.json({ disease });

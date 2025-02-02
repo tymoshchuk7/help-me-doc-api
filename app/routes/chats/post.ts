@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
+import { NotFoundException } from '../../exceptions';
 import { sendNewMessageNotification } from '../../socketIOServer';
 import { TenantChat } from '../../types';
 
@@ -15,7 +16,7 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
   const { data: { participantRecipientId, content } } = req.body;
 
   if (!tenantParticipant) {
-    throw new Error('Tenant participant is missing');
+    throw new NotFoundException({ message: 'Tenant participant is missing' });
   }
 
   const {
@@ -24,7 +25,7 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
   } = tenant;
 
   if (!tenant) {
-    throw new Error('Tenant is missing');
+    throw new NotFoundException({ message: 'Tenant is missing' });
   }
   const chatQueryObject = ChatController.query();
 
@@ -40,7 +41,7 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
   const chat = createdChatBefore || (await ChatController.create({}));
 
   if (!chat) {
-    throw new Error('Tenant chat is missing');
+    throw new NotFoundException({ message: 'Tenant chat is missing' });
   }
 
   const senderChatMember = await (createdChatBefore ? ChatMemberController.findOne({
@@ -52,13 +53,13 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
   }));
 
   if (!senderChatMember) {
-    throw new Error('Tenant sender chat participant is missing');
+    throw new NotFoundException({ message: 'Tenant sender chat participant is missing' });
   }
 
   const participantRecipient = await ParticipantController.findOneById(participantRecipientId);
 
   if (!participantRecipient) {
-    throw new Error('Tenant recipient is missing');
+    throw new NotFoundException({ message: 'Tenant recipient is missing' });
   }
 
   if (!createdChatBefore) {

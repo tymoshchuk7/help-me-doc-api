@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { TenantController } from '../controllers';
-import { ApiError } from '../utils';
+import { NotFoundException, ApiException } from '../exceptions';
 import { ROLE_PERMISSIONS } from '../constants';
 import { AccessError, Permissions } from '../types';
 
@@ -10,19 +10,19 @@ export default function loadTenant(permissions: Permissions[] | CheckPermissions
   return async function (req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.user) {
-        return next(new ApiError({ message: 'User is missing.', statusCode: 404 }));
+        return next(new NotFoundException({ message: 'User is missing.' }));
       }
 
       const tenant = await TenantController.findOneById(req.user.default_tenant);
       if (!tenant) {
-        return next(new ApiError({ message: 'Tenant is missing.', statusCode: 404 }));
+        return next(new NotFoundException({ message: 'Tenant is missing.' }));
       }
       req.tenant = tenant;
 
       const { ParticipantController } = tenant;
       const participant = await ParticipantController.findOne({ user_id: req.user.id });
       if (!participant) {
-        return next(new ApiError({ message: 'Participant is missing.', statusCode: 404 }));
+        return next(new NotFoundException({ message: 'Participant is missing.' }));
       }
       req.tenantParticipant = participant;
 
@@ -33,14 +33,14 @@ export default function loadTenant(permissions: Permissions[] | CheckPermissions
 
         const hasPermissions = permissions.every((permission) => ROLE_PERMISSIONS[participant.role].has(permission));
         if (!hasPermissions) {
-          return next(new ApiError({
+          return next(new ApiException({
             message: 'Access denied. You do not have the required permissions.',
             statusCode: 403,
           }));
         }
       } else {
         if (!(await permissions(req))) {
-          return next(new ApiError({
+          return next(new ApiException({
             message: 'Access denied. You do not have the required permissions.',
             statusCode: 403,
           }));

@@ -1,12 +1,13 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
+import { NotFoundException } from '../../exceptions';
 import { GlobalTableNames } from '../../types';
 
 export default asyncRoute(async (req: Request, res: Response) => {
   const { tenantParticipant, params: { id }, tenant } = req;
 
   if (!tenantParticipant) {
-    throw new Error('Tenant participant is missing');
+    throw new NotFoundException({ message: 'Tenant participant is missing' });
   }
 
   const { ChatController, ChatMessageController } = tenant;
@@ -35,7 +36,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
     .first();
 
   if (!chat) {
-    throw new Error('Chat is missing');
+    throw new NotFoundException({ message: 'Chat is missing' });
   }
 
   const messageQueryObject = ChatMessageController.query();
