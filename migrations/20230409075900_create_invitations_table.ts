@@ -6,6 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     table.uuid('tenant').references('tenants.id').notNullable();
     table.string('email').notNullable();
     table.string('role').notNullable();
+    table.timestamps(true, true);
   });
 }
 

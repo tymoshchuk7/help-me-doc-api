@@ -10,6 +10,7 @@ import getAvailableContacts from './getAvailableContacts';
 import post from './post';
 import get from './get';
 import retrieve from './retrieve';
+import markMessageAsRead from './markMessageAsRead';
 
 const messageValidationSchema: Schema = {
   'data.participantRecipientId': {
@@ -51,4 +52,11 @@ export default Router()
     loadTenant([Permissions.CAN_SEND_MESSAGES]),
     ...validateParams(),
     (req: Request, res: Response) => void retrieve(req, res),
+  )
+  .put(
+    '/:id',
+    authenticateUser(),
+    loadTenant([Permissions.CAN_SEND_MESSAGES]),
+    ...validateParams(),
+    (req: Request, res: Response) => void markMessageAsRead(req, res),
   );

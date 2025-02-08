@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
+import { pick } from 'lodash';
 import { asyncRoute } from '../../helpers';
 import { TenantDisease } from '../../types';
-import { pickFromObject } from '../../utils';
 
 interface Body {
   data: Pick<TenantDisease, 'name' | 'description' | 'treatment' | 'status'>,
@@ -17,7 +17,7 @@ export default asyncRoute(async (req: Request<Params, object, Body>, res: Respon
   const { DiseaseController } = tenant;
 
   const disease = await DiseaseController.update({ id }, {
-    ...pickFromObject<TenantDisease>(data, ['name', 'description', 'treatment', 'status']),
+    ...pick(data, ['name', 'description', 'treatment', 'status']),
   });
 
   return res.json({ disease });

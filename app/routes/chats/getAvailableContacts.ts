@@ -1,12 +1,13 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
+import { NotFoundException } from '../../exceptions';
 import { GlobalTableNames } from '../../types';
 
 export default asyncRoute(async (req: Request, res: Response) => {
   const { tenantParticipant, tenant } = req;
 
   if (!tenantParticipant) {
-    throw new Error('Tenant participant is missing');
+    throw new NotFoundException({ message: 'Tenant participant is missing' });
   }
 
   const { ParticipantController } = tenant;

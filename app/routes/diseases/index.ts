@@ -4,6 +4,7 @@ import {
   authenticateUser, loadTenant, validate,
   validateParams,
 } from '../../middlewares';
+import { NotFoundException } from '../../exceptions';
 import { ROLE_PERMISSIONS } from '../../constants';
 import { Permissions } from '../../types';
 
@@ -44,12 +45,12 @@ const diseaseValidationSchema: Schema = {
 async function canSeeDisease(req: Request) {
   const { tenant, tenantParticipant } = req;
   if (!tenant) {
-    throw new Error('Tenant is missing');
+    throw new NotFoundException({ message: 'Tenant is missing' });
   }
   const { DiseaseController } = tenant;
   const disease = await DiseaseController.findOneById(req.params.id);
   if (!disease) {
-    throw new Error('Disease is missing');
+    throw new NotFoundException({ message: 'Disease is missing' });
   }
 
   if (tenantParticipant.role === 'patient') {
@@ -62,13 +63,13 @@ async function canSeeDisease(req: Request) {
 async function canUpdateDisease(req: Request) {
   const { tenant, tenantParticipant } = req;
   if (!tenant) {
-    throw new Error('Tenant is missing');
+    throw new NotFoundException({ message: 'Tenant is missing' });
   }
 
   const { DiseaseController } = tenant;
   const disease = await DiseaseController.findOneById(req.params.id);
   if (!disease) {
-    throw new Error('Disease is missing');
+    throw new NotFoundException({ message: 'Disease is missing' });
   }
 
   return disease.doctor_participant_id === tenantParticipant.id;

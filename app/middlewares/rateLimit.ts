@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Redis from 'ioredis';
 import { config } from '../config';
-import { ApiError } from '../utils';
+import { ApiException } from '../exceptions';
 import { AccessError } from '../types';
 
 const redis = new Redis(config.redisUrl);
@@ -39,7 +39,7 @@ export default ({ rate }: Params): (req: Request, res: Response, next: NextFunct
       const { period, number } = getRequestRate(rate);
 
       if (!key) {
-        return next(new ApiError({ message: 'Request id is missing.' }));
+        return next(new ApiException({ message: 'Request id is missing.' }));
       }
 
       const replies = await redis.multi()
@@ -56,7 +56,7 @@ export default ({ rate }: Params): (req: Request, res: Response, next: NextFunct
         }
 
         if (hits as number > number) {
-          return next(new ApiError({ message: 'Too many requests. Please, try again later', statusCode: 429 }));
+          return next(new ApiException({ message: 'Too many requests. Please, try again later', statusCode: 429 }));
         }
       }
 

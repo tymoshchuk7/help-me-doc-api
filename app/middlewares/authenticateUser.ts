@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import checkJWT from './checkJWT';
 import { UserController } from '../controllers';
-import { ApiError } from '../utils';
+import { ApiException, NotFoundException } from '../exceptions';
 import { AccessError } from '../types';
 
 export default (): [
@@ -16,7 +16,7 @@ export default (): [
   ) => {
     try {
       if (!request.auth) {
-        return next(new ApiError({ message: 'Unauthorized', statusCode: 401 }));
+        return next(new ApiException({ message: 'Unauthorized', statusCode: 401 }));
       }
       const {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -31,7 +31,7 @@ export default (): [
       }
 
       if (!request.user) {
-        return next(new ApiError({ message: 'User is malformed', statusCode: 404 }));
+        return next(new NotFoundException({ message: 'User is malformed' }));
       }
       next();
     } catch (e) {

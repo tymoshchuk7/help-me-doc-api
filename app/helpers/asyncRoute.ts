@@ -1,4 +1,5 @@
 import { NextFunction, Response, Request } from 'express';
+import { ApiException } from '../exceptions';
 
 type ReturnType = Promise<void | Response> | void | Response;
 
@@ -9,10 +10,10 @@ export default function asyncRoute(
 ) {
   return (req: Request, res: Response): ReturnType => Promise.resolve(
     fn(req, res),
-  ).catch((err: { errors?: [] }) => {
+  ).catch((err: ApiException) => {
     // eslint-disable-next-line no-console
     console.error(err);
-    res.status(400).json({
+    res.status(err.statusCode || 400).json({
       error: String(err),
     });
   });

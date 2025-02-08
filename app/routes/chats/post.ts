@@ -1,5 +1,7 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
+import { NotFoundException } from '../../exceptions';
+import { sendNewMessageNotification } from '../../socketIOServer';
 import { TenantChat } from '../../types';
 
 interface Body {
@@ -10,11 +12,11 @@ interface Body {
 }
 
 export default asyncRoute(async (req: Request<object, object, Body>, res: Response) => {
-  const { tenantParticipant, tenant } = req;
+  const { tenantParticipant, tenant, user } = req;
   const { data: { participantRecipientId, content } } = req.body;
 
   if (!tenantParticipant) {
-    throw new Error('Tenant participant is missing');
+    throw new NotFoundException({ message: 'Tenant participant is missing' });
   }
 
   const {
@@ -23,7 +25,7 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
   } = tenant;
 
   if (!tenant) {
-    throw new Error('Tenant is missing');
+    throw new NotFoundException({ message: 'Tenant is missing' });
   }
   const chatQueryObject = ChatController.query();
 
@@ -39,30 +41,45 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
   const chat = createdChatBefore || (await ChatController.create({}));
 
   if (!chat) {
-    throw new Error('Tenant chat is missing');
+    throw new NotFoundException({ message: 'Tenant chat is missing' });
   }
 
-  const senderChatMember = await ChatMemberController.create({
+  const senderChatMember = await (createdChatBefore ? ChatMemberController.findOne({
     participant_id: tenantParticipant.id,
     chat_id: chat.id,
-  });
+  }) : ChatMemberController.create({
+    participant_id: tenantParticipant.id,
+    chat_id: chat.id,
+  }));
+
+  if (!senderChatMember) {
+    throw new NotFoundException({ message: 'Tenant sender chat participant is missing' });
+  }
 
   const participantRecipient = await ParticipantController.findOneById(participantRecipientId);
 
   if (!participantRecipient) {
-    throw new Error('Tenant recipient is missing');
+    throw new NotFoundException({ message: 'Tenant recipient is missing' });
   }
 
-  await ChatMemberController.create({
-    participant_id: participantRecipient.id,
-    chat_id: chat.id,
-  });
+  if (!createdChatBefore) {
+    await ChatMemberController.create({
+      participant_id: participantRecipient.id,
+      chat_id: chat.id,
+    });
+  }
 
-  await ChatMessageController.create({
+  const message = await ChatMessageController.create({
     chat_id: chat.id,
     chat_member_id: senderChatMember?.id,
     content,
-    sent_timestamp: new Date().toISOString(),
+  });
+
+  sendNewMessageNotification({
+    recipientParticipantId: participantRecipient.id,
+    userSender: user,
+    messageId: message.id,
+    chatId: chat.id,
   });
 
   return res.json({ chat });
