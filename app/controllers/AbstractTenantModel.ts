@@ -22,7 +22,7 @@ export abstract class TenantModel<T extends ModelMeta> {
     return result;
   }
 
-  async find(condition: Partial<T>) {
+  async find(condition: Partial<T>): Promise<T[]> {
     const tableName = this.tenant[this.tenantTableName];
     return db(tableName).where(condition);
   }

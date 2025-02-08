@@ -6,7 +6,7 @@ import { Server, Socket, ExtendedError } from 'socket.io';
 import { createServer } from 'http';
 import { config } from './config';
 import { UserController, TenantController } from './controllers';
-import { TenantChatMember, User } from './types';
+import { TenantChatMember, User, TenantMessage } from './types';
 
 interface Handshake {
   token: string,
@@ -83,12 +83,18 @@ const authenticateSocket = (socket: Socket, next: (err?: ExtendedError) => void)
 const broadcastNotification = ({ roomName, event, payload }: INotification) =>
   socketIO.to(roomName).emit(event, JSON.stringify(payload));
 
-const broadcastChatMessage = (chatId: string, message: object) => broadcastNotification({
-  roomName: getChatRoomName(chatId),
+const broadcastChatMessage = (message: TenantMessage) => broadcastNotification({
+  roomName: getChatRoomName(message.chat_id),
   event: 'RECEIVE_MESSAGE',
   payload: message,
 });
-// socketIO.to(participantMainRoom).emit('READY')
+
+export const broadcastChatMessageUpdate = (message: TenantMessage) => broadcastNotification({
+  roomName: getChatRoomName(message.chat_id),
+  event: 'RECEIVE_MESSAGE_UPDATE',
+  payload: message,
+});
+
 const broadcastSocketReady = (roomName: string) => broadcastNotification({
   roomName,
   event: 'READY',
@@ -148,7 +154,7 @@ socketIO
           chat_member_id: chatMember.id,
           content,
         });
-        broadcastChatMessage(chatId, message);
+        broadcastChatMessage(message);
 
         const queryObject = ChatMemberController.query();
         const chatMemberRecipient: TenantChatMember = await queryObject
