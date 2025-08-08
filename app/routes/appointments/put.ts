@@ -4,7 +4,7 @@ import { asyncRoute } from '../../helpers';
 import { TenantAppointment } from '../../types';
 
 interface Body {
-  data: Pick<TenantAppointment, 'starting_date' | 'ending_date' | 'status' | 'patient_participant_id'>,
+  data: Pick<TenantAppointment, 'status'>,
 }
 
 interface Params {
@@ -18,7 +18,7 @@ export default asyncRoute(async (req: Request<Params, object, Body>, res: Respon
   const { AppointmentController } = tenant;
 
   const appointment = await AppointmentController.update({ id }, {
-    ...pick(data, ['starting_date', 'ending_date', 'starting_date', 'patient_participant_id']),
+    ...pick(data, ['status']),
   });
 
   return res.json({ appointment });

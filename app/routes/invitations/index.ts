@@ -1,9 +1,9 @@
 import { Request, Response, Router } from 'express';
-import { Schema } from 'express-validator';
 import {
   authenticateUser, loadTenant, validate,
   validateParams,
 } from '../../middlewares';
+import { invitationValidation } from '../../validation';
 import { Permissions } from '../../types';
 
 import post from './post';
@@ -11,17 +11,12 @@ import get from './get';
 import retrieve from './retrieve';
 import accept from './accept';
 
-const invitationValidationSchema: Schema = {
-  'data.email': { isEmail: true },
-  'data.role': { isIn: { options: [['patient', 'doctor', 'admin']] } },
-};
-
 export default Router()
   .post(
     '/',
     authenticateUser(),
     loadTenant([Permissions.CAN_INVITE_USERS]),
-    ...validate(invitationValidationSchema),
+    ...validate(invitationValidation.createSchema),
     (req: Request, res: Response) => void post(req, res),
   )
   .get(

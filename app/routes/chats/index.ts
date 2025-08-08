@@ -1,30 +1,16 @@
 import { Request, Response, Router } from 'express';
-import { Schema } from 'express-validator';
 import {
   authenticateUser, loadTenant, validate,
   validateParams,
 } from '../../middlewares';
 import { Permissions } from '../../types';
+import { messageValidation } from '../../validation';
 
 import getAvailableContacts from './getAvailableContacts';
 import post from './post';
 import get from './get';
 import retrieve from './retrieve';
 import markMessageAsRead from './markMessageAsRead';
-
-const messageValidationSchema: Schema = {
-  'data.participantRecipientId': {
-    errorMessage: 'Recipient is required',
-    notEmpty: true,
-    isLength: {
-      options: { max: 36 },
-    },
-  },
-  'data.content': {
-    errorMessage: 'Recipient is required',
-    notEmpty: true,
-  },
-};
 
 export default Router()
   .get(
@@ -37,7 +23,7 @@ export default Router()
     '/',
     authenticateUser(),
     loadTenant([Permissions.CAN_SEND_MESSAGES]),
-    ...validate(messageValidationSchema),
+    ...validate(messageValidation.createSchema),
     (req: Request, res: Response) => void post(req, res),
   )
   .get(
