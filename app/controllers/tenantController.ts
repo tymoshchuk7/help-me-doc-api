@@ -8,6 +8,7 @@ import ChatController from './chatController';
 import ChatMemberController from './chatMemberController';
 import MessageController from './messageController';
 import DiseaseController from './diseaseController';
+import AppointmentController from './appointmentController';
 
 export type TenantControllerSet = Tenant & {
   ParticipantController: ParticipantController,
@@ -15,6 +16,7 @@ export type TenantControllerSet = Tenant & {
   ChatMemberController: ChatMemberController,
   ChatMessageController: MessageController
   DiseaseController: DiseaseController,
+  AppointmentController: AppointmentController,
 };
 
 const serializeValue = (tenant: Tenant): TenantControllerSet => ({
@@ -24,6 +26,7 @@ const serializeValue = (tenant: Tenant): TenantControllerSet => ({
   ChatMemberController: new ChatMemberController(tenant),
   ChatMessageController: new MessageController(tenant),
   DiseaseController: new DiseaseController(tenant),
+  AppointmentController: new AppointmentController(tenant),
 });
 
 export function createTenantParticipantsTable(tenant: Tenant, ctx: Knex.Transaction) {
@@ -81,12 +84,41 @@ export function createTenantChatMembersTable(tenant: Tenant, ctx: Knex.Transacti
 export function createTenantDiseasesTable(tenant: Tenant, ctx: Knex.Transaction) {
   return db.schema.createTable(tenant.tenant_diseases_table, (table) => {
     table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-    table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`);
-    table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`);
+    table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
+    table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
     table.string('name').notNullable();
     table.enu('status', ['active', 'resolved', 'chronic']).notNullable();
     table.text('description');
     table.text('treatment');
+    table.timestamps(true, true);
+  }).transacting(ctx);
+}
+
+export function createTenantAppointmentsTable(tenant: Tenant, ctx: Knex.Transaction) {
+  console.log({ tenant })
+
+  return db.schema.createTable(tenant.tenant_appointments_table, (table) => {
+    table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
+    // table.uuid('doctor_participant_id')
+    //   .notNullable()
+    //   .references('id')
+    //   .inTable(tenant.tenant_participants_table)
+    //   .onDelete('CASCADE');
+    //
+    // table.uuid('patient_participant_id')
+    //   .notNullable()
+    //   .references('id')
+    //   .inTable(tenant.tenant_participants_table)
+    //   .onDelete('CASCADE');
+
+    table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
+    table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
+    table.datetime('starting_date', { useTz: true }).notNullable();
+    table.datetime('ending_date', { useTz: true }).notNullable();
+    table.enu('status', ['pending', 'completed']).notNullable();
+
+    table.unique(['doctor_participant_id', 'starting_date'], 'uq_doc_participant_start');
+    table.unique(['patient_participant_id', 'starting_date'], 'uq_patient_participant_start');
     table.timestamps(true, true);
   }).transacting(ctx);
 }
@@ -106,6 +138,8 @@ class TenantController {
       'tenant_messages_table',
       'tenant_chats_members_table',
       'tenant_media_table',
+      'tenant_diseases_table',
+      'tenant_appointments_table',
     ];
   }
 
@@ -126,6 +160,7 @@ class TenantController {
             tenant_chats_members_table: tableNames.chat_members_table,
             tenant_media_table: tableNames.media_table,
             tenant_diseases_table: tableNames.diseases_table,
+            tenant_appointments_table: tableNames.appointments_table,
           })
           .returning('*')
           .transacting(ctx);
@@ -136,6 +171,7 @@ class TenantController {
         await createTenantChatMembersTable(tenant, ctx);
         await createTenantMessagesTable(tenant, ctx);
         await createTenantMediaTable(tenant, ctx);
+        await createTenantAppointmentsTable(tenant, ctx);
 
         await ctx.commit();
 
@@ -170,6 +206,7 @@ class TenantController {
         tenant_chats_members_table: tableNames.chat_members_table,
         tenant_media_table: tableNames.media_table,
         tenant_diseases_table: tableNames.diseases_table,
+        tenant_appointments_table: tableNames.appointments_table,
       })
       .returning('*')
       .transacting(ctx);
@@ -180,6 +217,7 @@ class TenantController {
     await createTenantChatMembersTable(tenant, ctx);
     await createTenantMessagesTable(tenant, ctx);
     await createTenantMediaTable(tenant, ctx);
+    await createTenantAppointmentsTable(tenant, ctx);
 
     return serializeValue(tenant);
   }

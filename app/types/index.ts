@@ -7,6 +7,8 @@ export enum Permissions {
   CAN_CREATE_DISEASES = 'CAN_CREATE_DISEASES',
   CAN_VIEW_DISEASES = 'CAN_VIEW_DISEASES',
   CAN_VIEW_PARTICIPANTS = 'CAN_VIEW_PARTICIPANTS',
+  CAN_VIEW_APPOINTMENTS = 'CAN_VIEW_APPOINTMENTS',
+  CAN_CREATE_APPOINTMENTS = 'CAN_CREATE_APPOINTMENTS',
 }
 
 export interface IJwtUser {
@@ -34,6 +36,7 @@ export interface ITableNames {
   chat_members_table: string,
   media_table: string,
   diseases_table: string,
+  appointments_table: string,
 }
 
 export enum GlobalTableNames {
@@ -63,6 +66,16 @@ export interface Tenant {
   tenant_chats_members_table: string,
   tenant_media_table: string,
   tenant_diseases_table: string,
+  tenant_appointments_table: string,
+}
+
+export interface TenantAppointment {
+  id: string,
+  doctor_participant_id: string,
+  patient_participant_id: string,
+  starting_date: string,
+  ending_date: string,
+  status: 'pending' | 'completed',
 }
 
 export interface TenantDisease {

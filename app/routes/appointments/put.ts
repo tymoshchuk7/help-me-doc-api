@@ -1,0 +1,25 @@
+import { Response, Request } from 'express';
+import { pick } from 'lodash';
+import { asyncRoute } from '../../helpers';
+import { TenantAppointment } from '../../types';
+
+interface Body {
+  data: Pick<TenantAppointment, 'starting_date' | 'ending_date' | 'status' | 'patient_participant_id'>,
+}
+
+interface Params {
+  [key: string]: string,
+}
+
+
+export default asyncRoute(async (req: Request<Params, object, Body>, res: Response) => {
+  const { tenant, params: { id }, body: { data } } = req;
+
+  const { AppointmentController } = tenant;
+
+  const appointment = await AppointmentController.update({ id }, {
+    ...pick(data, ['starting_date', 'ending_date', 'starting_date', 'patient_participant_id']),
+  });
+
+  return res.json({ appointment });
+});
