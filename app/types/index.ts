@@ -73,9 +73,10 @@ export interface TenantAppointment {
   id: string,
   doctor_participant_id: string,
   patient_participant_id: string,
-  starting_date: string,
-  ending_date: string,
-  status: 'pending' | 'completed',
+  scheduled_at:  string,
+  duration_minutes: number,
+  status: 'pending' | 'completed' | 'confirmed' | 'cancelled',
+  notes?: string
 }
 
 export interface TenantDisease {

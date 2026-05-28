@@ -10,7 +10,7 @@
     "start": "NODE_ENV=development npx ts-node-dev --unhandled-rejections=strict -r dotenv/config --files .",
     "dev": "npm run db:migrate && npm run db:seed && npm run start",
     "lint": "eslint --ext .ts,.tsx ./",
-    "lint-fix": "npm run lint-pure -- --fix",
+    "lint-fix": "npm run lint -- --fix",
     "check-types": "tsc --noEmit",
     "test": "npm run lint && npm run check-types"
   },

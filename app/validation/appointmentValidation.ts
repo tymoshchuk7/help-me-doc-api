@@ -1,16 +1,10 @@
 import { Schema } from 'express-validator';
 
 const createSchema: Schema = {
-  'data.starting_date': {
+  'data.scheduled_at': {
     notEmpty: true,
     isLength: {
       options: { max: 150 },
-    },
-  },
-  'data.ending_date': {
-    notEmpty: true,
-    isLength: {
-      options: { max: 2048 },
     },
   },
   'data.patient_participant_id': {
