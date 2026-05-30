@@ -75,7 +75,7 @@ export interface TenantAppointment {
   patient_participant_id: string,
   scheduled_at:  string,
   duration_minutes: number,
-  status: 'pending' | 'completed' | 'confirmed' | 'cancelled',
+  status: 'pending' | 'completed' | 'cancelled',
   notes?: string
 }
 

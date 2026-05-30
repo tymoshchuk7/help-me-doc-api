@@ -102,7 +102,7 @@ export async function createTenantAppointmentsTable(tenant: Tenant, ctx: Knex.Tr
 
     table.timestamp('scheduled_at').notNullable();
     table.integer('duration_minutes').notNullable().defaultTo(30);
-    table.enu('status', ['pending', 'completed', 'confirmed', 'cancelled']).notNullable();
+    table.enu('status', ['pending', 'completed', 'cancelled']).notNullable();
 
     table.text('notes').nullable();
     table.timestamps(true, true);
