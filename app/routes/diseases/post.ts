@@ -9,7 +9,6 @@ interface Body {
 export default asyncRoute(async (req: Request<object, object, Body>, res: Response) => {
   const { tenantParticipant } = req;
   const { tenant } = req;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { data: { name, description, status, treatment, patient_participant_id } } = req.body;
 
   const { DiseaseController } = tenant;

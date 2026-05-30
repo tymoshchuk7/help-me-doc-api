@@ -4,45 +4,39 @@ import {
   validateParams,
 } from '../../middlewares';
 import { Permissions } from '../../types';
-import { messageValidation } from '../../validation';
+import { appointmentValidation } from '../../validation';
 
-import getAvailableContacts from './getAvailableContacts';
 import post from './post';
 import get from './get';
+import put from './put';
 import retrieve from './retrieve';
-import markMessageAsRead from './markMessageAsRead';
 
 export default Router()
-  .get(
-    '/contacts',
-    authenticateUser(),
-    loadTenant([Permissions.CAN_SEND_MESSAGES]),
-    (req: Request, res: Response) => void getAvailableContacts(req, res),
-  )
   .post(
     '/',
     authenticateUser(),
-    loadTenant([Permissions.CAN_SEND_MESSAGES]),
-    ...validate(messageValidation.createSchema),
+    loadTenant([Permissions.CAN_CREATE_APPOINTMENTS]),
+    ...validate(appointmentValidation.createSchema),
     (req: Request, res: Response) => void post(req, res),
   )
   .get(
     '/',
     authenticateUser(),
-    loadTenant([Permissions.CAN_SEND_MESSAGES]),
+    loadTenant([Permissions.CAN_VIEW_APPOINTMENTS]),
     (req: Request, res: Response) => void get(req, res),
   )
   .get(
     '/:id',
     authenticateUser(),
-    loadTenant([Permissions.CAN_SEND_MESSAGES]),
+    loadTenant([Permissions.CAN_VIEW_APPOINTMENTS]),
     ...validateParams(),
     (req: Request, res: Response) => void retrieve(req, res),
   )
   .put(
     '/:id',
     authenticateUser(),
-    loadTenant([Permissions.CAN_SEND_MESSAGES]),
+    loadTenant([Permissions.CAN_CREATE_APPOINTMENTS]),
     ...validateParams(),
-    (req: Request, res: Response) => void markMessageAsRead(req, res),
+    ...validate(appointmentValidation.updateSchema),
+    (req: Request, res: Response) => void put(req, res),
   );

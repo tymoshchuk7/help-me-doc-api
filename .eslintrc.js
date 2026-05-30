@@ -17,12 +17,12 @@ module.exports = {
         'no-await-in-loop': 0,
         'no-bitwise': 0,
         'no-void': 0,
-        "import/extensions": [
-            "error",
-            "ignorePackages",
+        'import/extensions': [
+            'error',
+            'ignorePackages',
             {
-              "js": "never",
-              "ts": "never",
+              "js": 'never',
+              "ts": 'never',
             }
         ],
         'max-lines': ["error", 160],
@@ -34,7 +34,7 @@ module.exports = {
         }],
 
         '@typescript-eslint/restrict-template-expressions': 'off',
-
+        '@typescript-eslint/naming-convention': 'off',
         '@typescript-eslint/no-non-null-assertion': 'error',
         '@typescript-eslint/no-unused-vars': 'error',
 
@@ -44,11 +44,11 @@ module.exports = {
         '@typescript-eslint/no-misused-promises': 'warn',
     },
     settings: {
-      "import/resolver": {
-        "node": {
-          "extensions": [
-            ".js",
-            ".ts",
+      'import/resolver': {
+        'node': {
+          'extensions': [
+            '.js',
+            '.ts',
           ]
         }
       }

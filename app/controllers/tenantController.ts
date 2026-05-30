@@ -8,6 +8,7 @@ import ChatController from './chatController';
 import ChatMemberController from './chatMemberController';
 import MessageController from './messageController';
 import DiseaseController from './diseaseController';
+import AppointmentController from './appointmentController';
 
 export type TenantControllerSet = Tenant & {
   ParticipantController: ParticipantController,
@@ -15,6 +16,7 @@ export type TenantControllerSet = Tenant & {
   ChatMemberController: ChatMemberController,
   ChatMessageController: MessageController
   DiseaseController: DiseaseController,
+  AppointmentController: AppointmentController,
 };
 
 const serializeValue = (tenant: Tenant): TenantControllerSet => ({
@@ -24,6 +26,7 @@ const serializeValue = (tenant: Tenant): TenantControllerSet => ({
   ChatMemberController: new ChatMemberController(tenant),
   ChatMessageController: new MessageController(tenant),
   DiseaseController: new DiseaseController(tenant),
+  AppointmentController: new AppointmentController(tenant),
 });
 
 export function createTenantParticipantsTable(tenant: Tenant, ctx: Knex.Transaction) {
@@ -81,12 +84,27 @@ export function createTenantChatMembersTable(tenant: Tenant, ctx: Knex.Transacti
 export function createTenantDiseasesTable(tenant: Tenant, ctx: Knex.Transaction) {
   return db.schema.createTable(tenant.tenant_diseases_table, (table) => {
     table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
-    table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`);
-    table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`);
+    table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
+    table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable();
     table.string('name').notNullable();
     table.enu('status', ['active', 'resolved', 'chronic']).notNullable();
     table.text('description');
     table.text('treatment');
+    table.timestamps(true, true);
+  }).transacting(ctx);
+}
+
+export async function createTenantAppointmentsTable(tenant: Tenant, ctx: Knex.Transaction) {
+  return db.schema.createTable(tenant.tenant_appointments_table, (table) => {
+    table.uuid('id', { primaryKey: true }).defaultTo(db.raw('uuid_generate_v4()'));
+    table.uuid('doctor_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable().onDelete('CASCADE');
+    table.uuid('patient_participant_id').references(`${tenant.tenant_participants_table}.id`).notNullable().onDelete('CASCADE');
+
+    table.timestamp('scheduled_at').notNullable();
+    table.integer('duration_minutes').notNullable().defaultTo(30);
+    table.enu('status', ['pending', 'completed', 'cancelled']).notNullable();
+
+    table.text('notes').nullable();
     table.timestamps(true, true);
   }).transacting(ctx);
 }
@@ -106,40 +124,20 @@ class TenantController {
       'tenant_messages_table',
       'tenant_chats_members_table',
       'tenant_media_table',
+      'tenant_diseases_table',
+      'tenant_appointments_table',
     ];
   }
 
   async create(value: Pick<Tenant, 'name' | 'user_id'>): Promise<TenantControllerSet> {
     const tenantName = `tenant-${value.user_id}`;
-    const tableNames = getTenantTablesNames(value.user_id);
 
     const result = await db.transaction(async (ctx) => {
       try {
-        const [tenant]: Tenant[] = await db(GlobalTableNames.tenants)
-          .insert({
-            name: value.name,
-            user_id: value.user_id,
-            tenant_name: tenantName,
-            tenant_participants_table: tableNames.participants_table,
-            tenant_chats_table: tableNames.chats_table,
-            tenant_messages_table: tableNames.messages_table,
-            tenant_chats_members_table: tableNames.chat_members_table,
-            tenant_media_table: tableNames.media_table,
-            tenant_diseases_table: tableNames.diseases_table,
-          })
-          .returning('*')
-          .transacting(ctx);
-
-        await createTenantParticipantsTable(tenant, ctx);
-        await createTenantDiseasesTable(tenant, ctx);
-        await createTenantChatsTable(tenant, ctx);
-        await createTenantChatMembersTable(tenant, ctx);
-        await createTenantMessagesTable(tenant, ctx);
-        await createTenantMediaTable(tenant, ctx);
-
-        await ctx.commit();
-
-        return tenant;
+        return await this.createTenantTables({
+          ...value,
+          name: tenantName,
+        }, ctx);
       } catch (e) {
         console.error(e);
         await ctx.rollback();
@@ -153,16 +151,13 @@ class TenantController {
     return serializeValue(result);
   }
 
-
-  async seedTenantTable(value: Pick<Tenant, 'name' | 'user_id' | 'id'>, ctx: Knex.Transaction): Promise<TenantControllerSet | undefined> {
+  private async createTenantTables(value: Pick<Tenant, 'name' | 'user_id'>, ctx: Knex.Transaction) {
     const tenantName = `tenant-${value.user_id}`;
     const tableNames = getTenantTablesNames(value.user_id);
 
     const [tenant]: Tenant[] = await db(GlobalTableNames.tenants)
       .insert({
-        id: value.id,
-        name: value.name,
-        user_id: value.user_id,
+        ...value,
         tenant_name: tenantName,
         tenant_participants_table: tableNames.participants_table,
         tenant_chats_table: tableNames.chats_table,
@@ -170,6 +165,7 @@ class TenantController {
         tenant_chats_members_table: tableNames.chat_members_table,
         tenant_media_table: tableNames.media_table,
         tenant_diseases_table: tableNames.diseases_table,
+        tenant_appointments_table: tableNames.appointments_table,
       })
       .returning('*')
       .transacting(ctx);
@@ -180,7 +176,13 @@ class TenantController {
     await createTenantChatMembersTable(tenant, ctx);
     await createTenantMessagesTable(tenant, ctx);
     await createTenantMediaTable(tenant, ctx);
+    await createTenantAppointmentsTable(tenant, ctx);
 
+    return tenant;
+  }
+
+  async seedTenantTable(value: Pick<Tenant, 'name' | 'user_id' | 'id'>, ctx: Knex.Transaction): Promise<TenantControllerSet | undefined> {
+    const tenant = await this.createTenantTables(value, ctx);
     return serializeValue(tenant);
   }
 

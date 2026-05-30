@@ -12,6 +12,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string('tenant_chats_members_table').notNullable();
     table.string('tenant_media_table').notNullable();
     table.string('tenant_diseases_table').notNullable();
+    table.string('tenant_appointments_table').notNullable();
     table.timestamps(true, true);
   });
 }

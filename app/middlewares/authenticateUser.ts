@@ -19,7 +19,6 @@ export default (): [
         return next(new ApiException({ message: 'Unauthorized', statusCode: 401 }));
       }
       const {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         email, meta_data: { first_name, last_name }, picture: avatar,
       } = request.auth;
       const user = await UserController.findOne({ email });

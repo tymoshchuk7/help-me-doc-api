@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Knex } from 'knex';
 import { User, GlobalTableNames } from '../app/types';
 import { TenantController } from '../app/controllers';

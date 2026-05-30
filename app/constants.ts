@@ -7,6 +7,8 @@ export const ROLE_PERMISSIONS: Record<TRole, Set<Permissions>> = {
     Permissions.CAN_CREATE_DISEASES,
     Permissions.CAN_VIEW_PARTICIPANTS,
     Permissions.CAN_VIEW_DISEASES,
+    Permissions.CAN_VIEW_APPOINTMENTS,
+    Permissions.CAN_CREATE_APPOINTMENTS,
   ]),
   patient: new Set([
     Permissions.CAN_SEND_MESSAGES,
@@ -16,6 +18,8 @@ export const ROLE_PERMISSIONS: Record<TRole, Set<Permissions>> = {
     Permissions.CAN_CREATE_DISEASES,
     Permissions.CAN_VIEW_PARTICIPANTS,
     Permissions.CAN_VIEW_DISEASES,
+    Permissions.CAN_VIEW_APPOINTMENTS,
+    Permissions.CAN_CREATE_APPOINTMENTS,
   ]),
   admin: new Set([
     Permissions.CAN_VIEW_PARTICIPANTS,

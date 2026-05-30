@@ -66,8 +66,8 @@ export default asyncRoute(async (req: Request, res: Response) => {
   const { tenant, tenantParticipant } = req;
 
   const shouldBuildQueryForParticipantsTable = tenantParticipant.role === 'admin';
-  const tableWidgetData = shouldBuildQueryForParticipantsTable ? await buildParticipantsTableQuery(tenant)
+  const data = shouldBuildQueryForParticipantsTable ? await buildParticipantsTableQuery(tenant)
     : await buildDiseasesTableQuery(tenant, tenantParticipant);
 
-  return res.json({ tableWidgetData });
+  return res.json({ data });
 });

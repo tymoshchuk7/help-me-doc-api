@@ -6,6 +6,7 @@ import invitations from './invitations';
 import chats from './chats';
 import diseases from './diseases';
 import participants from './participants';
+import appointments from './appointments';
 
 export default Router()
   .get('/', (req, res) => res.sendStatus(200))
@@ -15,4 +16,5 @@ export default Router()
   .use('/invitations', invitations)
   .use('/chats', chats)
   .use('/diseases', diseases)
-  .use('/participants', participants);
+  .use('/participants', participants)
+  .use('/appointments', appointments);
