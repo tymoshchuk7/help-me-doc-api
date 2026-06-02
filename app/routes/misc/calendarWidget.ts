@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
 import { db } from '../../database';
 import { asyncRoute } from '../../helpers';
-import { TenantControllerSet } from '../../controllers/tenantController';
+import { TenantControllerSet } from '../../controllers/tenant.controller';
 import { GlobalTableNames, TenantParticipant } from '../../types';
 
 const getAppointmentsTableQuerySet = (tenantParticipant: TenantParticipant) => {

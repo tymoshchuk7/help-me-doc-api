@@ -1,4 +1,4 @@
-import { TenantModel } from './AbstractTenantModel';
+import { TenantModel } from './abstract-tenant-model';
 import { TenantAppointment, TenantTableName, Tenant } from '../types';
 import { db } from '../database';
 
