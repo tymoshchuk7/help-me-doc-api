@@ -1,4 +1,5 @@
 import { Schema } from 'express-validator';
+import { TenantAppointmentStatus } from '../types';
 
 const createSchema: Schema = {
   'data.scheduled_at': {
@@ -16,7 +17,7 @@ const updateSchema: Schema = {
   'data.status': {
     optional: true,
     notEmpty: true,
-    isIn: { options: [['pending', 'completed']] },
+    isIn: { options: [[...Object.values(TenantAppointmentStatus)] ] },
   },
 };
 

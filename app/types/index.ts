@@ -69,14 +69,26 @@ export interface Tenant {
   tenant_appointments_table: string,
 }
 
+export enum TenantAppointmentStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  CANCELED = 'canceled',
+}
+
 export interface TenantAppointment {
   id: string,
   doctor_participant_id: string,
   patient_participant_id: string,
   scheduled_at:  string,
   duration_minutes: number,
-  status: 'pending' | 'completed' | 'cancelled',
+  status: TenantAppointmentStatus,
   notes?: string
+}
+
+export enum TenantDiseaseStatus {
+  ACTIVE = 'active',
+  RESOLVED = 'resolved',
+  CHRONIC = 'chronic',
 }
 
 export interface TenantDisease {
@@ -84,7 +96,7 @@ export interface TenantDisease {
   doctor_participant_id: string,
   patient_participant_id: string,
   name: string,
-  status: 'active' | 'resolved' | 'chronic',
+  status: TenantDiseaseStatus,
   description: string,
   treatment: string,
 }
