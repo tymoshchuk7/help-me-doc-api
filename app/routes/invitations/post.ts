@@ -1,12 +1,12 @@
 import { Response, Request } from 'express';
 import { asyncRoute, sendEmail } from '../../helpers';
 import { InvitationController } from '../../controllers';
-import { TRole } from '../../types';
+import { UserRole } from '../../types';
 
 interface Body {
   data: {
     email: string,
-    role: TRole,
+    role: UserRole,
   },
 }
 

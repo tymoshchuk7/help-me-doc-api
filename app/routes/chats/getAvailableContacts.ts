@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
 import { NotFoundException } from '../../exceptions';
-import { GlobalTableNames } from '../../types';
+import { GlobalTableNames, UserRole } from '../../types';
 
 export default asyncRoute(async (req: Request, res: Response) => {
   const { tenantParticipant, tenant } = req;
@@ -11,7 +11,8 @@ export default asyncRoute(async (req: Request, res: Response) => {
   }
 
   const { ParticipantController } = tenant;
-  const searchCondition = tenantParticipant.role === 'patient' ? { role: 'doctor' } : { role: 'patient' };
+  const searchCondition = tenantParticipant.role === UserRole.PATIENT ? { role: UserRole.DOCTOR }
+    : { role: UserRole.PATIENT };
 
   const queryObject = ParticipantController.query();
 

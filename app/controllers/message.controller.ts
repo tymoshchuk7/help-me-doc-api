@@ -1,4 +1,4 @@
-import { TenantModel } from './AbstractTenantModel';
+import { TenantModel } from './abstract-tenant-model';
 import { Tenant, TenantMessage, TenantTableName } from '../types';
 
 class MessageController extends TenantModel<TenantMessage> {

@@ -1,4 +1,3 @@
-export type TRole = 'chief' | 'patient' | 'doctor' | 'admin';
 
 export enum Permissions {
   CAN_INVITE_USERS = 'CAN_INVITE_USERS',
@@ -69,14 +68,26 @@ export interface Tenant {
   tenant_appointments_table: string,
 }
 
+export enum TenantAppointmentStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  CANCELED = 'canceled',
+}
+
 export interface TenantAppointment {
   id: string,
   doctor_participant_id: string,
   patient_participant_id: string,
   scheduled_at:  string,
   duration_minutes: number,
-  status: 'pending' | 'completed' | 'cancelled',
+  status: TenantAppointmentStatus,
   notes?: string
+}
+
+export enum TenantDiseaseStatus {
+  ACTIVE = 'active',
+  RESOLVED = 'resolved',
+  CHRONIC = 'chronic',
 }
 
 export interface TenantDisease {
@@ -84,23 +95,30 @@ export interface TenantDisease {
   doctor_participant_id: string,
   patient_participant_id: string,
   name: string,
-  status: 'active' | 'resolved' | 'chronic',
+  status: TenantDiseaseStatus,
   description: string,
   treatment: string,
+}
+
+export enum UserRole {
+  ADMIN = 'admin',
+  CHIEF = 'chief',
+  PATIENT = 'patient',
+  DOCTOR = 'doctor',
 }
 
 export interface Invitation {
   id: string,
   tenant: string,
   email: string,
-  role: TRole,
+  role: UserRole,
 }
 
 export interface TenantParticipant {
   id: string,
   user_id: string,
   status: string,
-  role: TRole,
+  role: UserRole,
 }
 
 export interface TenantChat {

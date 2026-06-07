@@ -1,7 +1,7 @@
-import { Permissions, TRole } from './types';
+import { Permissions, UserRole } from './types';
 
-export const ROLE_PERMISSIONS: Record<TRole, Set<Permissions>> = {
-  chief: new Set([
+export const ROLE_PERMISSIONS: Record<UserRole, Set<Permissions>> = {
+  [UserRole.CHIEF]: new Set([
     Permissions.CAN_INVITE_USERS,
     Permissions.CAN_SEND_MESSAGES,
     Permissions.CAN_CREATE_DISEASES,
@@ -10,10 +10,10 @@ export const ROLE_PERMISSIONS: Record<TRole, Set<Permissions>> = {
     Permissions.CAN_VIEW_APPOINTMENTS,
     Permissions.CAN_CREATE_APPOINTMENTS,
   ]),
-  patient: new Set([
+  [UserRole.PATIENT]: new Set([
     Permissions.CAN_SEND_MESSAGES,
   ]),
-  doctor: new Set([
+  [UserRole.DOCTOR]: new Set([
     Permissions.CAN_SEND_MESSAGES,
     Permissions.CAN_CREATE_DISEASES,
     Permissions.CAN_VIEW_PARTICIPANTS,
@@ -21,7 +21,7 @@ export const ROLE_PERMISSIONS: Record<TRole, Set<Permissions>> = {
     Permissions.CAN_VIEW_APPOINTMENTS,
     Permissions.CAN_CREATE_APPOINTMENTS,
   ]),
-  admin: new Set([
+  [UserRole.ADMIN]: new Set([
     Permissions.CAN_VIEW_PARTICIPANTS,
     Permissions.CAN_INVITE_USERS,
   ]),

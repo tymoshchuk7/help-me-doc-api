@@ -1,4 +1,8 @@
 import { Schema } from 'express-validator';
+import { TenantDiseaseStatus } from '../types';
+
+const diseasesStatus = [...Object.values(TenantDiseaseStatus)];
+const createDiseasesStatus = diseasesStatus.filter((i => i != TenantDiseaseStatus.ACTIVE));
 
 const createSchema: Schema = {
   'data.name': {
@@ -14,7 +18,7 @@ const createSchema: Schema = {
   },
   'data.status': {
     notEmpty: true,
-    isIn: { options: [['active', 'chronic']] },
+    isIn: { options: [createDiseasesStatus] },
   },
   'data.treatment': {
     isLength: {
@@ -43,7 +47,7 @@ const updateSchema: Schema = {
   'data.status': {
     optional: true,
     notEmpty: true,
-    isIn: { options: [['active', 'resolved', 'chronic']] },
+    isIn: { options: [diseasesStatus] },
   },
   'data.treatment': {
     optional: true,

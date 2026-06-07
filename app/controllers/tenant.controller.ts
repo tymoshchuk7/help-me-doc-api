@@ -3,12 +3,12 @@ import { Knex } from 'knex';
 import { GlobalTableNames, Tenant } from '../types';
 import { db } from '../database';
 import { getTenantTablesNames } from '../helpers';
-import ParticipantController from './participantController';
-import ChatController from './chatController';
-import ChatMemberController from './chatMemberController';
-import MessageController from './messageController';
-import DiseaseController from './diseaseController';
-import AppointmentController from './appointmentController';
+import ParticipantController from './participant.controller';
+import ChatController from './chat.controller';
+import ChatMemberController from './chat-member.controller';
+import MessageController from './message.controller';
+import DiseaseController from './disease.controller';
+import AppointmentController from './appointment.controller';
 
 export type TenantControllerSet = Tenant & {
   ParticipantController: ParticipantController,

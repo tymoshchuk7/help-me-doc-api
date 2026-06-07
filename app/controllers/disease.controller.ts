@@ -1,4 +1,4 @@
-import { TenantModel } from './AbstractTenantModel';
+import { TenantModel } from './abstract-tenant-model';
 import { TenantDisease, TenantTableName, Tenant } from '../types';
 
 class DiseaseController extends TenantModel<TenantDisease> {

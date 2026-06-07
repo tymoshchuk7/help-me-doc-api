@@ -1,5 +1,5 @@
-import { Model } from './AbstractModel';
-import TenantController from './tenantController';
+import { Model } from './abstract-model';
+import TenantController from './tenant.controller';
 import { GlobalTableNames, User } from '../types';
 
 class UserController extends Model<User> {

@@ -1,3 +1,3 @@
-export { default as UserController } from './userController';
-export { default as InvitationController } from './invitationController';
-export { default as TenantController, TenantControllerSet } from './tenantController';
+export { default as UserController } from './user.controller';
+export { default as InvitationController } from './invitation.controller';
+export { default as TenantController, TenantControllerSet } from './tenant.controller';

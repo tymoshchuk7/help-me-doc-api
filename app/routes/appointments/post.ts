@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
-import { TenantAppointment } from '../../types';
+import { TenantAppointment, TenantAppointmentStatus } from '../../types';
 
 interface Body {
   data: Pick<TenantAppointment, 'scheduled_at' | 'patient_participant_id'>,
@@ -17,7 +17,7 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
     doctor_participant_id: tenantParticipant.id,
     scheduled_at,
     duration_minutes: 60,
-    status: 'pending',
+    status: TenantAppointmentStatus.PENDING,
   });
 
   return res.json({ appointment });

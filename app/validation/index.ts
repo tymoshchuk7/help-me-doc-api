@@ -1,5 +1,5 @@
-export { default as appointmentValidation } from './appointmentValidation';
-export { default as diseaseValidation } from './diseaseValidation';
-export { default as messageValidation } from './messageValidation';
-export { default as invitationValidation } from './invitationValidation';
-export { default as tenantValidation } from './tenantValidation';
+export { default as appointmentValidation } from './appointment.schemas';
+export { default as diseaseValidation } from './disease.schemas';
+export { default as messageValidation } from './message.schemas';
+export { default as invitationValidation } from './invitation.schemas';
+export { default as tenantValidation } from './tenant.schemas';

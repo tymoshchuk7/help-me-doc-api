@@ -1,4 +1,4 @@
-import { TenantModel } from './AbstractTenantModel';
+import { TenantModel } from './abstract-tenant-model';
 import { Tenant, TenantParticipant, TenantTableName } from '../types';
 
 class ParticipantController extends TenantModel<TenantParticipant> {

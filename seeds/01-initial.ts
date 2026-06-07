@@ -107,9 +107,5 @@ class CreateInitialData {
 
 export async function seed(knex: Knex) {
   const client = new CreateInitialData(knex);
-  const createdUsers = await knex(GlobalTableNames.users).where({});
-  if (!!createdUsers.length) {
-    return;
-  }
   return client.createInitialTenant();
 }

@@ -1,4 +1,4 @@
-import { Model } from './AbstractModel';
+import { Model } from './abstract-model';
 import { GlobalTableNames, Invitation } from '../types';
 
 class InvitationController extends Model<Invitation> {
