@@ -6,7 +6,7 @@ import {
 import { diseaseValidation } from '../../validation';
 import { NotFoundException } from '../../exceptions';
 import { ROLE_PERMISSIONS } from '../../constants';
-import { Permissions } from '../../types';
+import { Permissions, UserRole } from '../../types';
 
 import post from './post';
 import put from './put';
@@ -26,7 +26,7 @@ async function canSeeDisease(req: Request) {
     throw new NotFoundException({ message: 'Disease is missing' });
   }
 
-  if (tenantParticipant.role === 'patient') {
+  if (tenantParticipant.role === UserRole.PATIENT) {
     return disease.patient_participant_id === tenantParticipant.id;
   }
 

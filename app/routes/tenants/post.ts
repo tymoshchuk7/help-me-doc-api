@@ -2,6 +2,7 @@ import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
 import { ApiException } from '../../exceptions';
 import { UserController, TenantController } from '../../controllers';
+import { UserRole } from '../../types';
 
 interface Body {
   data: { name: string },
@@ -22,7 +23,7 @@ export default asyncRoute(async (req: Request<object, object, Body>, res: Respon
 
   const { ParticipantController } = tenant;
   await UserController.update({ id: user.id }, { default_tenant: tenant.id });
-  await ParticipantController.create({ role: 'chief', user_id: user.id });
+  await ParticipantController.create({ role: UserRole.CHIEF, user_id: user.id });
 
   const updatedUser = await UserController.findUserJoiningParticipant(user.id);
 

@@ -1,4 +1,3 @@
-export type TRole = 'chief' | 'patient' | 'doctor' | 'admin';
 
 export enum Permissions {
   CAN_INVITE_USERS = 'CAN_INVITE_USERS',
@@ -101,18 +100,25 @@ export interface TenantDisease {
   treatment: string,
 }
 
+export enum UserRole {
+  ADMIN = 'admin',
+  CHIEF = 'chief',
+  PATIENT = 'patient',
+  DOCTOR = 'doctor',
+}
+
 export interface Invitation {
   id: string,
   tenant: string,
   email: string,
-  role: TRole,
+  role: UserRole,
 }
 
 export interface TenantParticipant {
   id: string,
   user_id: string,
   status: string,
-  role: TRole,
+  role: UserRole,
 }
 
 export interface TenantChat {

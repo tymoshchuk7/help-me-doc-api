@@ -2,15 +2,15 @@ import { Response, Request } from 'express';
 import { db } from '../../database';
 import { asyncRoute } from '../../helpers';
 import { TenantControllerSet } from '../../controllers/tenant.controller';
-import { GlobalTableNames, TenantParticipant } from '../../types';
+import { GlobalTableNames, TenantParticipant, UserRole } from '../../types';
 
 const getDiseaseTableQuerySet = (tenantParticipant: TenantParticipant) => {
   switch (tenantParticipant.role) {
-    case 'patient':
+    case UserRole.PATIENT:
       return { patient_participant_id: tenantParticipant.id };
-    case 'doctor':
+    case UserRole.DOCTOR:
       return { doctor_participant_id: tenantParticipant.id };
-    case 'chief':
+    case UserRole.CHIEF:
       return {};
     default:
       throw new Error('Unexpected role to access data for the patients');
@@ -65,7 +65,7 @@ const buildDiseasesTableQuery = (tenant: TenantControllerSet, tenantParticipant:
 export default asyncRoute(async (req: Request, res: Response) => {
   const { tenant, tenantParticipant } = req;
 
-  const shouldBuildQueryForParticipantsTable = tenantParticipant.role === 'admin';
+  const shouldBuildQueryForParticipantsTable = tenantParticipant.role === UserRole.ADMIN;
   const data = shouldBuildQueryForParticipantsTable ? await buildParticipantsTableQuery(tenant)
     : await buildDiseasesTableQuery(tenant, tenantParticipant);
 
