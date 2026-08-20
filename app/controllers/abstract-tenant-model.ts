@@ -22,6 +22,12 @@ export abstract class TenantModel<T extends ModelMeta> {
     return result;
   }
 
+  async createMany(value: Partial<T>[]): Promise<T[]> {
+    const tableName = this.tenant[this.tenantTableName];
+    const result: T[] = await db(tableName).insert(value).returning('*');
+    return result;
+  }
+
   async find(condition: Partial<T>): Promise<T[]> {
     const tableName = this.tenant[this.tenantTableName];
     return db(tableName).where(condition);

@@ -142,7 +142,7 @@ export interface TenantMessage {
 export interface TenantMedia {
   id: string,
   message_id: string,
-  bucket_name: string,
+  bucket_path: string,
 }
 
 export interface ModelMeta {

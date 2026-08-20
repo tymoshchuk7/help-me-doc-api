@@ -14,4 +14,11 @@ const createSchema: Schema = {
   },
 };
 
-export default { createSchema };
+const preUploadAttachmentSchema: Schema = {
+  'data.originalName': {
+    errorMessage: 'originalName is required',
+    notEmpty: true,
+  },
+};
+
+export default { createSchema, preUploadAttachmentSchema };

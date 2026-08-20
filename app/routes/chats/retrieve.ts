@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
 import { asyncRoute } from '../../helpers';
 import { NotFoundException } from '../../exceptions';
-import { GlobalTableNames } from '../../types';
+import { GlobalTableNames, TenantMedia } from '../../types';
 
 export default asyncRoute(async (req: Request, res: Response) => {
   const { tenantParticipant, params: { id }, tenant } = req;
@@ -10,7 +10,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
     throw new NotFoundException({ message: 'Tenant participant is missing' });
   }
 
-  const { ChatController, ChatMessageController } = tenant;
+  const { ChatController, ChatMessageController, TenantMediaController } = tenant;
 
   const chatQueryObject = ChatController.query();
   const chat = await chatQueryObject
@@ -40,7 +40,7 @@ export default asyncRoute(async (req: Request, res: Response) => {
   }
 
   const messageQueryObject = ChatMessageController.query();
-  const messages = await messageQueryObject
+  const messages: Array<{ id: string }> = await messageQueryObject
     .join(`${tenant.tenant_chats_members_table} as tcm`, `${tenant.tenant_messages_table}.chat_member_id`, 'tcm.id')
     .join(`${tenant.tenant_participants_table} as tp`, 'tcm.participant_id', 'tp.id')
     .join(`${GlobalTableNames.users} as user`, 'tp.user_id', 'user.id')
@@ -56,5 +56,21 @@ export default asyncRoute(async (req: Request, res: Response) => {
     )
     .orderBy(`${tenant.tenant_messages_table}.created_at`, 'asc');
 
-  return res.json({ chat, messages });
+  const tenantMediaQueryObject = TenantMediaController.query();
+  const media: TenantMedia[] = await tenantMediaQueryObject.where('message_id', 'in', messages.map((m) => m.id));
+
+  const mediaMapping = media.reduce<Record<string, TenantMedia[]>>((acc, prevValue) => {
+    if (!acc[prevValue.message_id]) {
+      acc[prevValue.message_id] = [];
+    }
+    acc[prevValue.message_id].push(prevValue);
+    return acc;
+  }, {});
+
+  const adjustedMessages = messages.map((m) => ({
+    ...m,
+    attachments: mediaMapping[m.id] ?? [],
+  }));
+
+  return res.json({ chat, messages: adjustedMessages });
 });

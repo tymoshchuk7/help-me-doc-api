@@ -18,6 +18,11 @@ interface ChatMessagePayload {
   chatId: string,
   participantId: string,
   content: string,
+  attachments: Array<{
+    uploadUrl: string,
+    originalName: string,
+    fileKey: string
+  }>,
 }
 
 interface INotification {
@@ -83,7 +88,7 @@ const authenticateSocket = (socket: Socket, next: (err?: ExtendedError) => void)
 const broadcastNotification = ({ roomName, event, payload }: INotification) =>
   socketIO.to(roomName).emit(event, JSON.stringify(payload));
 
-const broadcastChatMessage = (message: TenantMessage) => broadcastNotification({
+const broadcastChatMessage = (message: TenantMessage & { attachments: any[] }) => broadcastNotification({
   roomName: getChatRoomName(message.chat_id),
   event: 'RECEIVE_MESSAGE',
   payload: message,
@@ -140,8 +145,10 @@ socketIO
       socket.on('LEAVE_CHAT_ROOM', (chatId: string) => socket.leave(getChatRoomName(chatId)));
 
       socket.on('CHAT_MESSAGE', async (data) => {
-        const { chatId, participantId: senderParticipantId, content }: ChatMessagePayload = JSON.parse(data as string);
-        const { ChatMessageController, ChatMemberController } = tenant;
+        const {
+          chatId, participantId: senderParticipantId, content, attachments = [],
+        }: ChatMessagePayload = JSON.parse(data as string);
+        const { ChatMessageController, ChatMemberController, TenantMediaController } = tenant;
         const chatMember = await ChatMemberController.findOne({
           chat_id: chatId,
           participant_id: senderParticipantId,
@@ -154,7 +161,28 @@ socketIO
           chat_member_id: chatMember.id,
           content,
         });
-        broadcastChatMessage(message);
+
+        const attachmentsToSave = attachments.map((attachment) => ({
+          message_id: message.id,
+          bucket_path: attachment.fileKey,
+        }));
+        let createdAttachments: any[] = [];
+        if (!!attachmentsToSave.length) {
+          createdAttachments = await TenantMediaController.createMany(attachmentsToSave);
+        }
+
+        broadcastChatMessage({
+          ...message,
+          attachments: createdAttachments,
+        });
+        // if (attachments.length) {
+        //   await TenantMediaController.createMany(
+        //     attachments.map((attachment) => ({
+        //       message_id: message.id,
+        //       bucket_path: attachment.fileKey,
+        //     })),
+        //   );
+        // }
 
         const queryObject = ChatMemberController.query();
         const chatMemberRecipient: TenantChatMember = await queryObject

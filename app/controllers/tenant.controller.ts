@@ -6,6 +6,7 @@ import { getTenantTablesNames } from '../helpers';
 import ParticipantController from './participant.controller';
 import ChatController from './chat.controller';
 import ChatMemberController from './chat-member.controller';
+import TenantMediaController from './tenant-media.controller';
 import MessageController from './message.controller';
 import DiseaseController from './disease.controller';
 import AppointmentController from './appointment.controller';
@@ -17,6 +18,7 @@ export type TenantControllerSet = Tenant & {
   ChatMessageController: MessageController
   DiseaseController: DiseaseController,
   AppointmentController: AppointmentController,
+  TenantMediaController: TenantMediaController,
 };
 
 const serializeValue = (tenant: Tenant): TenantControllerSet => ({
@@ -27,6 +29,7 @@ const serializeValue = (tenant: Tenant): TenantControllerSet => ({
   ChatMessageController: new MessageController(tenant),
   DiseaseController: new DiseaseController(tenant),
   AppointmentController: new AppointmentController(tenant),
+  TenantMediaController: new TenantMediaController(tenant),
 });
 
 export function createTenantParticipantsTable(tenant: Tenant, ctx: Knex.Transaction) {

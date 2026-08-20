@@ -11,6 +11,7 @@ import post from './post';
 import get from './get';
 import retrieve from './retrieve';
 import markMessageAsRead from './markMessageAsRead';
+import preUploadFile from './preUploadFile';
 
 export default Router()
   .get(
@@ -45,4 +46,11 @@ export default Router()
     loadTenant([Permissions.CAN_SEND_MESSAGES]),
     ...validateParams(),
     (req: Request, res: Response) => void markMessageAsRead(req, res),
+  )
+  .post(
+    '/pre-upload',
+    authenticateUser(),
+    loadTenant([Permissions.CAN_SEND_MESSAGES]),
+    ...validate(messageValidation.preUploadAttachmentSchema),
+    (req: Request, res: Response) => void preUploadFile(req, res),
   );
